@@ -9,7 +9,9 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-
+### PyCharm || other jetbrains stuff
+.idea/
+.idea/*
 
 #my stuff
 *.db
