@@ -1,31 +1,19 @@
 # -*- coding: utf-8 -*-
 from tinydb import TinyDB, Query
+from tinydb.storages import JSONStorage, MemoryStorage
+from tinydb.middlewares import CachingMiddleware
 from .basestore import SQLiteBase, AbstractKvInterface
-class PersistentStore(SQLiteBase):
+from .basecache import CacheBase, CacheHookedMixin
+class PersistentStore(SQLiteBase, CacheHookedMixin):
     def __init__(self, filename=':memory:'):
-        self._cache = {}
+        self._cache = CacheBase()
         self._cache_len = 0
         SQLiteBase.__init__(self, filename=filename)
-    def _cache_set(self, key, value):
-        self._cache[key] = value
-    def _cache_get(self, key):
-        return self._cache.get(key, None)
-    def _before_set(self, key, value):
-        pass
-    def _before_get(self, key):
-        pass
-    def set(self, key, value, cache=True):
-        self._before_set(key, value)
-        if cache: self._cache_set(key, value)
+    def set(self, key, value, **kwargs):
         packed = self._serializer.serialize(value)
         self._insert(key, packed)
-    def get(self, key, cache=True):
-        self._before_get(key, )
-        if cache:
-            cached_result = self._cache_get(key)
-            if cached_result:
-                return cached_result
-
+    def get(self, key, **kwargs):
+        if 'value' in kwargs: return kwargs['value']
         packed = self._query(key)
         if packed:
             return self._serializer.deserialize(packed)
@@ -36,14 +24,17 @@ class PersistentStore(SQLiteBase):
         self.set(key, value)
 
 class TinyPersistStore(AbstractKvInterface):
-    def __init__(self, filename):
-        self._db = TinyDB(filename)
+    def __init__(self, filename=None):
+        if filename is not None:
+            self._db = TinyDB(filename, storage=CachingMiddleware(JSONStorage))
+        else:
+            self._db = TinyDB(storage=CachingMiddleware(MemoryStorage))
     def __del__(self):
         pass
-    def set(self, key, value, cache=None):
+    def set(self, key, value, **kwargs):
         self._db.insert(dict(key=key, value=value))
-    def get(self, key, cache=None):
+    def get(self, key, **kwargs):
         q = Query()
-        return self._db.search(q.key==key)[0]
+        return self._db.search(q.key == key)[0]
     def count(self):
         return self._db.count()

@@ -17,3 +17,4 @@ class MemoryStore(SQLiteBase):
         self.cur.close()
         self.con.commit()
         self.con.close()
+

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 import msgpack
+import ujson
 
 custom_serializers = {}
 
@@ -17,11 +18,13 @@ class KeyValueSerializer:
     @staticmethod
     def _pack(obj):
         """Serialize our `obj` with the msgpack lib"""
-        return msgpack.packb(obj, use_bin_type=True)
+        # return msgpack.packb(obj, use_bin_type=True)
+        return ujson.dumps(obj)
     @staticmethod
     def _unpack(obj):
         """Deserialize our `obj` with the msgpack lib"""
-        return msgpack.unpackb(obj, use_list=False)
+        # return msgpack.unpackb(obj, use_list=False)
+        return ujson.loads(obj)
     def _before_pack(self, obj):
         type_key = types.get(type(obj), None)
         if type_key:

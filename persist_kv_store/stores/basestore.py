@@ -2,11 +2,12 @@
 import sqlite3
 from typing import Union
 from .serializer import KeyValueSerializer
+from .meta import HookMeta
 
 DEBUG = False
-class AbstractKvInterface(object):
-    def set(self, key, value, cache): raise NotImplementedError
-    def get(self, key, cach): raise NotImplementedError
+class AbstractKvInterface(object, metaclass=HookMeta):
+    def set(self, key, value, **kwargs): raise NotImplementedError
+    def get(self, key, **kwargs): raise NotImplementedError
     def __del__(self): raise NotImplementedError
     def __getitem__(self, item):
         return self.get(item)
