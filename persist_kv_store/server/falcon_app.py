@@ -4,13 +4,17 @@ import falcon
 import ujson as json
 from traceback import print_exc
 from .utils import *
-from ..stores.memstore import MemoryStore
+from ..stores.memstore import MemoryStore, RedisStore
 from ..stores.persiststore import PersistentStore
 from threading import RLock, Lock
+import redis
 
 api = falcon.API()
 lock = RLock()
 dbs = {}
+
+pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0)
+rd = RedisStore(redis.Redis(connection_pool=pool))
 
 def create_store(name, type_):
     if type_ == 'mem':
@@ -45,33 +49,21 @@ def db_create_persistent(req, resp, name, persist):
     except Exception as exc:
         print_exc()
         return bad_request(error=exc)
-def db_get(req, resp, name, key):
+def db_get(req, resp, prefix, key):
     try:
-        if name in dbs:
-            return db_response(dbs[name].get(key))
-        else:
-            db = open_store(name)
-            if db is not None:
-                return db_response(db.get(key))
-            return not_found(msg='database does not exist')
-
+        k = '_'.join((prefix, key))
+        return db_response(rd.get(k))
     except Exception as exc:
         print_exc()
         return bad_request(msg=str(exc))
-def db_set(req, resp, name, key):
+def db_set(req, resp, prefix, key):
     try:
         if req.content_length:
             value = json.loads(req.stream)
         else:
             raise ValueError('request sent no data')
-        # print(value)
-        if name in dbs:
-            return db_response(dbs[name].set(key, value['key']))
-        else:
-            db = open_store(name)
-            if db is not None:
-                return db_response(db.get(key))
-            return not_found(msg='database does not exist')
+        k = '_'.join((prefix, key))
+        return db_response(rd.set(k, value))
     except Exception as exc:
         print_exc()
         return bad_request(msg=str(exc))
@@ -97,16 +89,16 @@ class StoreAction:
             resp.body = json.dumps(bad_request(msg=str(exc)))
 
 class StoreGet:
-    def on_get(self, req, resp, name, key):
-        resp.body = json.dumps(db_get(req, resp, name, key))
+    def on_get(self, req, resp, prefix, key):
+        resp.body = json.dumps(db_get(req, resp, prefix, key))
 
 class StoreSet:
-    def on_put(self, req, resp, name, key):
+    def on_put(self, req, resp, prefix, key):
         resp.body = json.dumps(
-            db_set(req, resp, name, key))
+            db_set(req, resp, prefix, key))
 
-api.add_route('/create-store/{name}', CreateMemStore())
-api.add_route('/create-store/{name}/true', CreatePersistentStore())
+# api.add_route('/create-store/{name}', CreateMemStore())
+# api.add_route('/create-store/{name}/true', CreatePersistentStore())
 # api.add_route('/db/{name}/action', StoreAction())
-api.add_route('/db/{name}/get/{key}', StoreGet())
-api.add_route('/db/{name}/set/{key}', StoreSet())
+api.add_route('/db/{prefix}/get/{key}', StoreGet())
+api.add_route('/db/{prefix}/set/{key}', StoreSet())

@@ -5,8 +5,8 @@ from .serializer import KeyValueSerializer
 
 DEBUG = False
 class AbstractKvInterface(object):
-    def set(self, key, value): raise NotImplementedError
-    def get(self, key): raise NotImplementedError
+    def set(self, key, value, cache): raise NotImplementedError
+    def get(self, key, cach): raise NotImplementedError
     def __del__(self): raise NotImplementedError
     def __getitem__(self, item):
         return self.get(item)
@@ -15,15 +15,16 @@ class AbstractKvInterface(object):
 
 class SQLiteBase(AbstractKvInterface):
     _serializer = KeyValueSerializer()
-    _key_value_schema = (
-        'CREATE TABLE kv_store ('
-        '  k TEXT PRIMARY KEY,'
-        '  v BLOB NOT NULL'
-        ');'
-    )
+    _key_value_schema = ('CREATE TABLE kv_store ('
+                         '  k TEXT PRIMARY KEY,'
+                         '  v BLOB NOT NULL'
+                         ');')
 
     def __init__(self, filename=':memory:', **kwargs):
-        self.lock = kwargs['lock']
+        if 'lock' in kwargs:
+            self.lock = kwargs['lock']
+        else:
+            self.lock = None
         self.con = sqlite3.connect(filename, check_same_thread=False)
         self.cur = self.con.cursor()
         if not self._table_exists('kv_store'):
@@ -40,7 +41,10 @@ class SQLiteBase(AbstractKvInterface):
         query = (
             "SELECT * FROM sqlite_master "
             "WHERE type='table' AND name=:name;")
-        with self.lock:
+        if self.lock:
+            with self.lock:
+                res = self.cur.execute(query, (table_name,)).fetchall()
+        else:
             res = self.cur.execute(query, (table_name,)).fetchall()
         return bool(res)
     def _insert(self, key_: str, value: bytes):
@@ -49,15 +53,20 @@ class SQLiteBase(AbstractKvInterface):
         if DEBUG:
             print(q.replace(':key_', key_).replace(
                 ':value', str(value)))
-
-        with self.lock:
-            self.cur.execute(q, (key_, value))
+        if self.lock:
+            with self.lock:
+                self.cur.execute(q, (key_, value))
+                self.con.commit()
+        else:
             self.con.commit()
-
+            self.cur.execute(q, (key_, value))
     def _query(self, key_: str) -> Union[bytes, bool]:
         q = "SELECT v FROM kv_store WHERE k = :key_;"
         if DEBUG: print(q.replace('key_', key_))
-        with self.lock:
+        if self.lock:
+            with self.lock:
+                res = self.cur.execute(q, (key_,)).fetchone()
+        else:
             res = self.cur.execute(q, (key_,)).fetchone()
         try:
             return res[0]
@@ -65,9 +74,22 @@ class SQLiteBase(AbstractKvInterface):
             return False
     def _count(self) -> int:
         q = "SELECT count(1) FROM kv_store;"
-        with self.lock:
+        if self.lock:
+            with self.lock:
+                res = self.cur.execute(q).fetchone()
+        else:
             res = self.cur.execute(q).fetchone()
         try:
             return self._get_result(res)
         except:
             return False
+    def __del__(self):
+        try:
+            self.cur.close()
+        except:
+            pass
+        try:
+            self.con.commit()
+            self.con.close()
+        except:
+            pass

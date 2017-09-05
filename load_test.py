@@ -7,6 +7,7 @@ import sys
 from datetime import datetime, timedelta
 from time import sleep
 from timeit import default_timer as clockit
+import urlparse
 from multiprocessing import Process, Lock as Lock
 import multiprocessing as mp
 # import threading as
@@ -15,12 +16,16 @@ import multiprocessing as mp
 def get_rand():
     return randrange(0, 1000000000)
 
+def httpreq(rul, data=None):
+
+
+
 def run_loadtest(que, inc, lock, it):
     host = '127.0.0.1'
     port = 7071
     url = f'http://{host}:{port}'
     # req = r.get(url=f'{url}/create-store/test-database/true')
-    req1 = r.get(url=f'{url}/create-store/test-mem')
+    # req1 = r.get(url=f'{url}/create-store/test-mem')
 
     for i in range(1, 9):
         r.post(f"{url}/db/test-mem/set/t{i}", json=json.dumps({
@@ -59,7 +64,7 @@ if __name__ == '__main__':
     lock = Lock()
     que = mp.Queue()
     INC = 10
-    PROCS = 8
+    PROCS = 16
     ITERATIONS = 10000
     MAX_N = PROCS * ITERATIONS
 
