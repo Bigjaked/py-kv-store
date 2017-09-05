@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 from tinydb.storages import JSONStorage, MemoryStorage
-from tinydb.middlewares import CachingMiddleware
-from .basestore import SQLiteBase, AbstractKvInterface
-from .basecache import CacheBase, CacheHookedMixin
-class PersistentStore(SQLiteBase, CacheHookedMixin):
+
+from .basecache import CacheBase, CacheHookedMixin, SimpleCache
+from .basestore import SQLiteBase
+
+class SqlitePersistentStore(SQLiteBase, CacheHookedMixin):
     def __init__(self, filename=':memory:'):
-        self._cache = CacheBase()
+        self._cache = CacheBase(SimpleCache())
         self._cache_len = 0
+        CacheHookedMixin.__init__(self)
         SQLiteBase.__init__(self, filename=filename)
     def set(self, key, value, **kwargs):
         packed = self._serializer.serialize(value)
@@ -23,12 +25,15 @@ class PersistentStore(SQLiteBase, CacheHookedMixin):
     def __setitem__(self, key, value):
         self.set(key, value)
 
-class TinyPersistStore(AbstractKvInterface):
+class TinyDBPersistStore(CacheHookedMixin):
     def __init__(self, filename=None):
+        CacheHookedMixin.__init__(self)
+        self._cache = CacheBase(SimpleCache())
+        self._cach_len = 0
         if filename is not None:
-            self._db = TinyDB(filename, storage=CachingMiddleware(JSONStorage))
+            self._db = TinyDB(filename, storage=JSONStorage)
         else:
-            self._db = TinyDB(storage=CachingMiddleware(MemoryStorage))
+            self._db = TinyDB(storage=MemoryStorage)
     def __del__(self):
         pass
     def set(self, key, value, **kwargs):

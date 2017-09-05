@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-import msgpack
+# import msgpack
 import ujson
 
 custom_serializers = {}

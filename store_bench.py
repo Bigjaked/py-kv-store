@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-from persist_kv_store.stores import (PersistentStore, TinyPersistStore, MemoryStore,
-    RedisStore, MemcacheStore, )
+from persist_kv_store.stores import (
+    SqlitePersistentStore, TinyDBPersistStore,
+    SqliteMemoryStore, SqliteMemoryStoreWithCache,
+    RedisStore, RedisStoreWithCache,
+    MemcacheStore, MemcacheStoreWithCache, )
 
 def fmt(val):
     if val > 1:
@@ -22,11 +25,11 @@ def fmt(val):
         else:
             return ' s', val
 
-def l_json(x, ln=100):
+def l_json(x, ln=50):
     return {f'k-{n}': n * i for n in range(ln)}
 
 if __name__ == '__main__':
-    from random import randrange
+    from collections import defaultdict
     from timeit import default_timer as clockit
     from math import pi
     import redis
@@ -40,9 +43,46 @@ if __name__ == '__main__':
         'sqlite-mem',
         'sqlite-disk',
         'memcached',
-        'tinydb'
+        # 'tinydb',
+        'overhead'
     ]
-    its = 100
+    its = 1000
+    cached = True
+    if 'overhead' in benchmarks:
+        #   BASIC SET AND GET
+        st = clockit()
+        d = defaultdict()
+        for i in range(0, its):
+            d[f'key-{i}'] = i * pi
+        et = clockit() - st
+        (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
+        print(f'\nBasic testing overhead (defaultdict):   Loops: {its}')
+        print('    {:-^40}'.format('get and set floating point values'))
+        print(f'    set: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}')
+        st = clockit()
+        for i in range(0, its):
+            abc = d[f'key-{i}']
+        et = clockit() - st
+        (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
+        print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}')
+
+        #   LONG SET AND GET
+        d = defaultdict()
+        st = clockit()
+        for i in range(0, its):
+            d[f'key-{i}'] = l_json(i)
+        dl = l_json(i)
+        et = clockit() - st
+        (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
+        print('    {:-^40}'.format('get and set 100 element dict'))
+        print(f'    set: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}')
+        st = clockit()
+        for i in range(0, its):
+            abc = d[f'key-{i}']
+        et = clockit() - st
+        (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
+        print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}\n'
+              f'        Total Time: {et:8.4f}')
 
     if 'sqlite-disk' in benchmarks:
         db_file = 'test-db.db'
@@ -50,12 +90,12 @@ if __name__ == '__main__':
             os.remove(db_file)
         except:
             pass
-        db = PersistentStore(db_file)
+        db = SqlitePersistentStore(db_file)
 
         #   BASIC SET AND GET
         st = clockit()
         for i in range(0, its):
-            db.set(f'key-{i}', randrange(0, 1000) * pi)
+            db.set(f'key-{i}', i * pi)
         et = clockit() - st
         (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
         print(f'\n{db.__class__.__name__}:   Loops: {its}')
@@ -82,16 +122,19 @@ if __name__ == '__main__':
         et = clockit() - st
         (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
         print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}\n'
-              f'        Total Time: {et:5.2f}')
+              f'        Total Time: {et:8.4f}')
     #
     #   MEMORY STORE
     #
     if 'memcached' in benchmarks:
-        db = MemcacheStore()
-        #   BASIC SET AND GET
+        if cached:
+            db = MemcacheStoreWithCache()
+        else:
+            db = MemcacheStore()
+        # BASIC SET AND GET
         st = clockit()
         for i in range(0, its):
-            db.set(f'key-{i}', randrange(0, 1000) * pi)
+            db.set(f'key-{i}', i * pi)
         et = clockit() - st
         (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
         print(f'\n{db.__class__.__name__}:   Loops: {its}')
@@ -117,17 +160,20 @@ if __name__ == '__main__':
         et = clockit() - st
         (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
         print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}\n'
-              f'        Total Time: {et:5.2f}')
+              f'        Total Time: {et:8.4f}')
 
     #
     #   MEMORY STORE
     #
     if 'sqlite-mem' in benchmarks:
-        db = MemoryStore(None)
-        #   BASIC SET AND GET
+        if cached:
+            db = SqliteMemoryStoreWithCache(None)
+        else:
+            db = SqliteMemoryStore(None)
+        # BASIC SET AND GET
         st = clockit()
         for i in range(0, its):
-            db.set(f'key-{i}', randrange(0, 1000) * pi)
+            db.set(f'key-{i}', i * pi)
         et = clockit() - st
         (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
         print(f'\n{db.__class__.__name__}:   Loops: {its}')
@@ -153,17 +199,20 @@ if __name__ == '__main__':
         et = clockit() - st
         (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
         print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}\n'
-              f'        Total Time: {et:5.2f}')
+              f'        Total Time: {et:8.4f}')
 
     #
     #   REDIS STORE
     #
     if 'redis' in benchmarks:
-        db = RedisStore(rd)
-        #   BASIC SET AND GET
+        if cached:
+            db = RedisStoreWithCache(rd)
+        else:
+            db = RedisStore(rd)
+        # BASIC SET AND GET
         st = clockit()
         for i in range(0, its):
-            db.set(f'key-{i}', randrange(0, 1000) * pi)
+            db.set(f'key-{i}', i * pi)
         et = clockit() - st
         (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
         print(f'\n{db.__class__.__name__}:   Loops: {its}')
@@ -190,7 +239,7 @@ if __name__ == '__main__':
         et = clockit() - st
         (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
         print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}\n'
-              f'        Total Time: {et:5.2f}')
+              f'        Total Time: {et:8.4f}')
     #
     #   TINYDB STORE
     #
@@ -199,12 +248,12 @@ if __name__ == '__main__':
         try:
             os.remove(db_file)
         except: pass
-        db = TinyPersistStore()
+        db = TinyDBPersistStore()
 
         #   BASIC SET AND GET
         st = clockit()
         for i in range(0, its):
-            db.set(f'key-{i}', randrange(0, 1000) * pi)
+            db.set(f'key-{i}', i * pi)
         et = clockit() - st
         (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
         print(f'\n{db.__class__.__name__}:   Loops: {its}')
@@ -231,4 +280,4 @@ if __name__ == '__main__':
         et = clockit() - st
         (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
         print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}\n'
-              f'        Total Time: {et:5.2f}')
+              f'        Total Time: {et:8.4f}')

@@ -5,7 +5,6 @@ class SimpleCache(OrderedDict):
     """Store items in the order the keys were last added
     Also moves any requested key back to the beginning of the dict
     """
-
     def __setitem__(self, key, value, **kwargs):
         if key in self:
             del self[key]
@@ -20,7 +19,7 @@ class SimpleCache(OrderedDict):
     def remove_last(self):
         a = self.popitem()
 
-class CacheHookedMixin:
+class CacheHookedMixin():
     def before_set(self, key, value, **kwargs):
         self._cache.set(key, value)
         return (key, value), kwargs
@@ -30,11 +29,8 @@ class CacheHookedMixin:
         return (key,), kwargs
 
 class CacheBase:
-    def __init__(self, cache=None, limit=1000):
-        if cache:
-            self._cache = cache()
-        else:
-            self._cache = SimpleCache()
+    def __init__(self, cache, limit=100):
+        self._cache = cache
         self._count = 0
         self._limit = limit
     def delete(self, key):
@@ -42,9 +38,9 @@ class CacheBase:
         self._count -= 1
     def set(self, key, value):
         self._cache[key] = value
-        # self._count = len(self._cache)
-        # if self._count > self._limit:
-        #     self._cache.remove_last()
+        self._count = len(self._cache)
+        if self._count > self._limit:
+            self._cache.remove_last()
     def get(self, key, default=None):
         return self._cache[key]
     def __setitem__(self, key, value):

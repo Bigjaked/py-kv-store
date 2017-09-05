@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import msgpack
+# import msgpack
 from pymemcache.client.base import Client
 from .basestore import AbstractKvInterface
+from .basecache import CacheBase, CacheHookedMixin, SimpleCache
 import ujson
+
 def pack(key, value):
     # return msgpack.packb(value, use_bin_type=True), 1
     return ujson.dumps(value), 1
@@ -22,7 +24,15 @@ class MemcacheStore(AbstractKvInterface):
         try:
             self._memcache.close()
         except: pass
-    def set(self, key, value, cache=None, **kwargs):
+    def set(self, key, value, **kwargs):
         self._memcache.set(key, value)
-    def get(self, key, cache=None):
+    def get(self, key, **kwargs):
+        if 'value' in kwargs: return kwargs['value']
         return self._memcache.get(key, None)
+
+class MemcacheStoreWithCache(MemcacheStore, CacheHookedMixin):
+    def __init__(self):
+        CacheHookedMixin.__init__(self)
+        MemcacheStore.__init__(self)
+        self._cache = CacheBase(SimpleCache())
+        self._cache_len = 0

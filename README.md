@@ -1,94 +1,105 @@
-#persist-kv-store
+# persist-kv-store
 
-###Simple interface to a few key value stores
-
-
+### Simple interface to a few key value stores
 
 
 
+Here is a quick benchmark of the different backends. 
+Note: the `SqlitePersistentStore` and the  `TinyDBPersistStore` both have caching enabled. 
+The `TinyDBPersistStore` is using the in memory store because the disk store, would take 
+more than 5 minutes for 1000 iterations.
 
 ```text
-
-PersistentStore:   Loops: 100
+Basic testing overhead (defaultdict):   Loops: 1000
     ---get and set floating point values----
-    set:  ops/s:   80.892,    s/op:    0.012
-    get: Kops/s:  180.032,   ms/op:    0.006
+    set: Mops/s:    2.693,   us/op:    0.371
+    get: Mops/s:    3.637,   us/op:    0.275
     ------get and set 100 element dict------
-    set:  ops/s:   76.240,    s/op:    0.013
-    get: Kops/s:   41.708,   ms/op:    0.024
-        Total Time:  0.00
+    set: Kops/s:   57.303,   ms/op:    0.017
+    get: Mops/s:    1.982,   us/op:    0.504
+        Total Time:   0.0005
 
-MemcacheStore:   Loops: 100
+SqlitePersistentStore:   Loops: 1000
     ---get and set floating point values----
-    set: Kops/s:   32.373,   ms/op:    0.031
-    get: Kops/s:   17.308,   ms/op:    0.058
+    set: Kops/s:  266.728,   ms/op:    0.004
+    get: Kops/s:  257.949,   ms/op:    0.004
     ------get and set 100 element dict------
-    set: Kops/s:   14.559,   ms/op:    0.069
-    get: Kops/s:   10.610,   ms/op:    0.094
-        Total Time:  0.01
+    set: Kops/s:   44.771,   ms/op:    0.022
+    get: Kops/s:  263.837,   ms/op:    0.004
+        Total Time:   0.0038
 
-MemoryStore:   Loops: 100
+MemcacheStore:   Loops: 1000
     ---get and set floating point values----
-    set: Kops/s:   60.182,   ms/op:    0.017
-    get: Kops/s:  119.399,   ms/op:    0.008
+    set: Kops/s:   46.658,   ms/op:    0.021
+    get: Kops/s:   18.710,   ms/op:    0.053
     ------get and set 100 element dict------
-    set: Kops/s:   13.778,   ms/op:    0.073
-    get: Kops/s:   37.899,   ms/op:    0.026
-        Total Time:  0.00
+    set: Kops/s:   22.725,   ms/op:    0.044
+    get: Kops/s:   14.035,   ms/op:    0.071
+        Total Time:   0.0713
 
-RedisStore:   Loops: 100
+SqliteMemoryStore:   Loops: 1000
     ---get and set floating point values----
-    set: Kops/s:    1.988,   ms/op:    0.503
-    get: Kops/s:    3.369,   ms/op:    0.297
+    set: Kops/s:   61.986,   ms/op:    0.016
+    get: Kops/s:  183.105,   ms/op:    0.005
     ------get and set 100 element dict------
-    set: Kops/s:    2.167,   ms/op:    0.461
-    get: Kops/s:    2.929,   ms/op:    0.341
-        Total Time:  0.03
+    set: Kops/s:   21.201,   ms/op:    0.047
+    get: Kops/s:   47.124,   ms/op:    0.021
+        Total Time:   0.0212
 
-TinyPersistStore:   Loops: 100
+RedisStore:   Loops: 1000
     ---get and set floating point values----
-    set: Kops/s:   12.786,   ms/op:    0.078
-    get: Kops/s:    3.647,   ms/op:    0.274
+    set: Kops/s:    2.824,   ms/op:    0.354
+    get: Kops/s:    3.333,   ms/op:    0.300
     ------get and set 100 element dict------
-    set: Kops/s:    4.148,   ms/op:    0.241
-    get: Kops/s:    2.257,   ms/op:    0.443
-        Total Time:  0.04
-
-
+    set: Kops/s:    2.978,   ms/op:    0.336
+    get: Kops/s:    3.207,   ms/op:    0.312
+        Total Time:   0.3118
 ```
 
-Here is the same benchmark at a 1000 iterations
 ```text
-PersistentStore: cache: True  Time: 12.73  Loops: 1000
+Basic testing overhead (defaultdict):   Loops: 1000
     ---get and set floating point values----
-    set:  ops/s:   78.542,    s/op:    0.013
-    get: Mops/s:    1.109,   us/op:    0.902
+    set: Mops/s:    2.679,   us/op:    0.373
+    get: Mops/s:    2.985,   us/op:    0.335
     ------get and set 100 element dict------
-    set:  ops/s:   73.003,    s/op:    0.014
-    get: Mops/s:    1.055,   us/op:    0.948
+    set: Kops/s:   52.832,   ms/op:    0.019
+    get: Mops/s:    2.722,   us/op:    0.367
+        Total Time:   0.0004
 
-MemoryStore: cache: True  Time:  0.04  Loops: 1000
+SqlitePersistentStore:   Loops: 1000
     ---get and set floating point values----
-    set: Kops/s:   23.705,   ms/op:    0.042
-    get: Kops/s:  166.289,   ms/op:    0.006
+    set: Kops/s:  188.970,   ms/op:    0.005
+    get: Kops/s:  256.771,   ms/op:    0.004
     ------get and set 100 element dict------
-    set: Kops/s:    9.535,   ms/op:    0.105
-    get: Kops/s:   47.277,   ms/op:    0.021
+    set: Kops/s:   48.487,   ms/op:    0.021
+    get: Kops/s:  217.817,   ms/op:    0.005
+        Total Time:   0.0046
 
-RedisStore: cache: True  Time:  0.42  Loops: 1000
+MemcacheStoreWithCache:   Loops: 1000
     ---get and set floating point values----
-    set: Kops/s:    2.400,   ms/op:    0.417
-    get: Kops/s:    3.222,   ms/op:    0.310
+    set: Kops/s:  206.835,   ms/op:    0.005
+    get: Kops/s:  211.290,   ms/op:    0.005
     ------get and set 100 element dict------
-    set: Kops/s:    2.620,   ms/op:    0.382
-    get: Kops/s:    2.806,   ms/op:    0.356
+    set: Kops/s:   48.056,   ms/op:    0.021
+    get: Kops/s:  204.959,   ms/op:    0.005
+        Total Time:   0.0049
 
-TinyPersistStore: cache: True  Time:  2.09  Loops: 1000
+SqliteMemoryStoreWithCache:   Loops: 1000
     ---get and set floating point values----
-    set:  ops/s:  477.706,    s/op:    0.002
-    get:  ops/s:  310.375,    s/op:    0.003
+    set: Kops/s:  233.037,   ms/op:    0.004
+    get: Kops/s:  255.578,   ms/op:    0.004
     ------get and set 100 element dict------
-    set:  ops/s:   21.485,    s/op:    0.047
-    get:  ops/s:   29.456,    s/op:    0.034
+    set: Kops/s:   49.516,   ms/op:    0.020
+    get: Kops/s:  249.041,   ms/op:    0.004
+        Total Time:   0.0040
+
+RedisStoreWithCache:   Loops: 1000
+    ---get and set floating point values----
+    set: Kops/s:  202.630,   ms/op:    0.005
+    get: Kops/s:  217.275,   ms/op:    0.005
+    ------get and set 100 element dict------
+    set: Kops/s:   48.022,   ms/op:    0.021
+    get: Kops/s:  212.728,   ms/op:    0.005
+        Total Time:   0.0047
 
 ```

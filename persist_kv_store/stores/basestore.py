@@ -22,6 +22,7 @@ class SQLiteBase(AbstractKvInterface):
                          ');')
 
     def __init__(self, filename=':memory:', **kwargs):
+        AbstractKvInterface.__init__(self)
         if 'lock' in kwargs:
             self.lock = kwargs['lock']
         else:
