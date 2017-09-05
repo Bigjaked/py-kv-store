@@ -1,5 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import server
-from . import stores
-
+from .stores import *
