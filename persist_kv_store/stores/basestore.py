@@ -2,17 +2,27 @@
 import sqlite3
 from typing import Union
 from .serializer import KeyValueSerializer
-from .meta import HookMeta
 
 DEBUG = False
-class AbstractKvInterface(object, metaclass=HookMeta):
-    def set(self, key, value, **kwargs): raise NotImplementedError
-    def get(self, key, **kwargs): raise NotImplementedError
+class AbstractKvInterface(object):
+    # Must be overwritten  in subclass
+    def set(self, key, value): raise NotImplementedError
+    def get(self, key): raise NotImplementedError
     def __del__(self): raise NotImplementedError
-    def __getitem__(self, item):
-        return self.get(item)
-    def __setitem__(self, key, value):
-        self.set(key, value)
+
+    # api convienience  methods
+    def _get_cached(self, key):
+        """standard cache get api"""
+        if hasattr(self, '_get_cache'):
+            return self._get_cache(key)
+        else:
+            return None
+    def _set_cached(self, key, value):
+        """standard cache set api"""
+        if hasattr(self, '_set_cache'):
+            self._set_cache(key, value)
+    def __getitem__(self, item): return self.get(item)
+    def __setitem__(self, key, value): self.set(key, value)
 
 class SQLiteBase(AbstractKvInterface):
     _serializer = KeyValueSerializer()
@@ -23,10 +33,8 @@ class SQLiteBase(AbstractKvInterface):
 
     def __init__(self, filename=':memory:', **kwargs):
         AbstractKvInterface.__init__(self)
-        if 'lock' in kwargs:
-            self.lock = kwargs['lock']
-        else:
-            self.lock = None
+
+        self.lock = kwargs.get('lock', None)
         self.con = sqlite3.connect(filename, check_same_thread=False)
         self.cur = self.con.cursor()
         if not self._table_exists('kv_store'):
@@ -76,11 +84,11 @@ class SQLiteBase(AbstractKvInterface):
             return False
     def _count(self) -> int:
         q = "SELECT count(1) FROM kv_store;"
-        if self.lock:
-            with self.lock:
-                res = self.cur.execute(q).fetchone()
-        else:
+        # if self.lock:
+        with self.lock:
             res = self.cur.execute(q).fetchone()
+        # else:
+        #     res = self.cur.execute(q).fetchone()
         try:
             return self._get_result(res)
         except:

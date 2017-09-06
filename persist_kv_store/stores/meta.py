@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from weakref import proxy, ref
+from weakref import ref
 
 def proxied_dict(*args):
     def append_iterable_proxied(dic, it):
@@ -34,7 +34,6 @@ class HookMeta(type):
                     if n_to_hook in space:
                         def fn(slf, *a, **k):
                             fn.__name__ = f'_{n_to_hook}_meta_{prefix}'
-                            # if name_ in self.__
                             try:
                                 (a_, k_) = space[name_](slf, *a, **k)
                             except:

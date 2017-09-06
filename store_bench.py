@@ -34,20 +34,22 @@ if __name__ == '__main__':
     from math import pi
     import redis
     import os
+    from persist_kv_store.bench import header, bench
 
     pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0)
     rd = RedisStore(redis.Redis(connection_pool=pool))
 
     benchmarks = [
-        'redis',
-        'sqlite-mem',
+        # 'redis',
+        # 'sqlite-mem',
         'sqlite-disk',
-        'memcached',
+        # 'memcached',
         # 'tinydb',
-        'overhead'
+        # 'overhead'
     ]
-    its = 1000
+    its = 100
     cached = True
+    print(header)
     if 'overhead' in benchmarks:
         #   BASIC SET AND GET
         st = clockit()
@@ -91,38 +93,39 @@ if __name__ == '__main__':
         except:
             pass
         db = SqlitePersistentStore(db_file)
+        bench(db, its)
 
         #   BASIC SET AND GET
-        st = clockit()
-        for i in range(0, its):
-            db.set(f'key-{i}', i * pi)
-        et = clockit() - st
-        (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
-        print(f'\n{db.__class__.__name__}:   Loops: {its}')
-        print('    {:-^40}'.format('get and set floating point values'))
-        print(f'    set: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}')
-        st = clockit()
-        for i in range(0, its):
-            db.get(f'key-{i}')
-        et = clockit() - st
-        (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
-        print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}')
-
-        #   LONG SET AND GET
-        st = clockit()
-        for i in range(0, its):
-            db.set(f'key-{i}', l_json(i))
-        et = clockit() - st
-        (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
-        print('    {:-^40}'.format('get and set 100 element dict'))
-        print(f'    set: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}')
-        st = clockit()
-        for i in range(0, its):
-            db.get(f'key-{i}')
-        et = clockit() - st
-        (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
-        print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}\n'
-              f'        Total Time: {et:8.4f}')
+        # st = clockit()
+        # for i in range(0, its):
+        #     db.set(f'key-{i}', i * pi)
+        # et = clockit() - st
+        # (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
+        # print(f'\n{db.__class__.__name__}:   Loops: {its}')
+        # print('    {:-^40}'.format('get and set floating point values'))
+        # print(f'    set: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}')
+        # st = clockit()
+        # for i in range(0, its):
+        #     db.get(f'key-{i}')
+        # et = clockit() - st
+        # (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
+        # print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}')
+        #
+        # #   LONG SET AND GET
+        # st = clockit()
+        # for i in range(0, its):
+        #     db.set(f'key-{i}', l_json(i))
+        # et = clockit() - st
+        # (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
+        # print('    {:-^40}'.format('get and set 100 element dict'))
+        # print(f'    set: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}')
+        # st = clockit()
+        # for i in range(0, its):
+        #     db.get(f'key-{i}')
+        # et = clockit() - st
+        # (ps_s, ps), (po_s, po) = (fmt(its / et), fmt(et / its))
+        # print(f'    get: {ps_s}ops/s: {ps:8.3f},   {po_s}/op: {po:8.3f}\n'
+        #       f'        Total Time: {et:8.4f}')
     #
     #   MEMORY STORE
     #

@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-from .basestore import SQLiteBase, AbstractKvInterface
-from .basecache import CacheBase, CacheHookedMixin, SimpleCache
+from .cache import CacheMixin
+from .basestore import SQLiteBase
 
-class SqliteMemoryStore(SQLiteBase, AbstractKvInterface):
-    def __init__(self, lock, **kwargs):
+class SqliteMemoryStore(SQLiteBase):
+    def __init__(self, **kwargs):
         SQLiteBase.__init__(
-            self, filename=':memory:', lock=lock, limit=None)
-    def set(self, key, value, **kwargs):
+            self, filename=':memory:', **kwargs)
+    def set(self, key, value):
+        self._set_cached(key, value)
         packed = self._serializer.serialize(value)
         self._insert(key, packed)
-    def get(self, key, **kwargs):
-        if 'value' in kwargs: return kwargs['value']
+    def get(self, key):
+        cached = self._get_cached(key)
+        if cached: return cached
         packed = self._query(key)
         if packed:
             return self._serializer.unserialize(packed)
@@ -20,9 +22,11 @@ class SqliteMemoryStore(SQLiteBase, AbstractKvInterface):
         self.con.commit()
         self.con.close()
 
-class SqliteMemoryStoreWithCache(SqliteMemoryStore, CacheHookedMixin):
+class SqliteMemoryStoreWithCache(SqliteMemoryStore, CacheMixin):
     def __init__(self, lock, **kwargs):
-        CacheHookedMixin.__init__(self)
-        SqliteMemoryStore.__init__(self, lock, **kwargs)
-        self._cache = CacheBase(SimpleCache())
-        self._cache_len = 0
+        SqliteMemoryStore.__init__(self, **kwargs)
+        CacheMixin.__init__(
+            self,
+            enabled=kwargs.get('cache', True),
+            limit=kwargs.get('limit', 1000),
+        )
