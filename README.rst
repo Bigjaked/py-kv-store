@@ -4,18 +4,11 @@ persist-kv-store
 
 Simple interface to a few key value stores
 ------------------------------------------
-Optional dependencies
 
-ujson_
+    **Optional dependencies**
 
-
-``pip install msgpack-python``
-
-
-msgpack-python_
-
-
-`pip install ujson``
+    - ujson_  can be installed with ``pip install msgpack-python``
+    - msgpack-python_ can be installed with ``pip install ujson``
 
 
 .. _msgpack-python: https://pypi.python.org/pypi/msgpack-python
