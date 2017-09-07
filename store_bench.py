@@ -5,7 +5,7 @@ from persist_kv_store.stores import (
     RedisStore,
     MemcacheStore, )
 from persist_kv_store.bench import bench, print_header, print_footer
-from persist_kv_store import LRUCache, DefaultDict, CacheDummy
+from persist_kv_store import LRUCache, CacheDummy
 
 if __name__ == '__main__':
     import redis
@@ -15,53 +15,60 @@ if __name__ == '__main__':
     rd = RedisStore(redis.Redis(connection_pool=pool))
 
     benchmarks = [
-        # 'overhead',
+        'overhead',
         'memcached',
         'sqlite-mem',
         'redis',
-        # 'sqlite-disk',
+        'sqlite-disk',
     ]
-    its = 1000
+    its = 100
     cache_size = 1000
-
+    bench_set = []
+    ba = bench_set.append
     print_header(its)
     if 'overhead' in benchmarks:
         db = CacheDummy()
-        bench(db, its, "'pure overhead'")
+        ba(bench(db, its, "'pure overhead'"))
 
         db = LRUCache(cache_size)
-        bench(db, its, "'subclassed OrderedDict'")
+        ba(bench(db, its, "'subclassed OrderedDict'"))
 
     if 'memcached' in benchmarks:
         db = MemcacheStore()
-        bench(db, its)
+        ba(bench(db, its))
 
         db = MemcacheStore(cache=LRUCache(cache_size))
-        bench(db, its, msg='LRUCache cache')
+        ba(bench(db, its, msg=' w/lru cache'))
 
     if 'sqlite-mem' in benchmarks:
         db = SqliteMemoryStore()
-        bench(db, its)
+        ba(bench(db, its))
 
         db = SqliteMemoryStore(cache=LRUCache(cache_size))
-        bench(db, its, msg='LRUCache cache')
+        ba(bench(db, its, msg=' w/lru cache'))
 
     if 'redis' in benchmarks:
         db = RedisStore(rd)
-        bench(db, its)
+        ba(bench(db, its))
 
         db = RedisStore(rd, cache=LRUCache(cache_size))
-        bench(db, its, msg='LRUCache cache')
+        ba(bench(db, its, msg=' w/lru cache'))
 
     if 'sqlite-disk' in benchmarks:
         db_file = 'test-db.db'
         if os.path.isfile(db_file): os.remove(db_file)
         db = SqlitePersistentStore(db_file)
-        bench(db, its)
+        ba(bench(db, its))
 
         db_file = 'test-db1.db'
         if os.path.isfile(db_file): os.remove(db_file)
         db = SqlitePersistentStore(db_file, cache=LRUCache(cache_size))
-        bench(db, its, msg='LRUCache cache')
+        ba(bench(db, its, msg=' w/lru cache'))
 
+    print('\nsorted table\n')
+
+    print_header(its)
+
+    for row in reversed(sorted(bench_set, key=lambda x: x[0])):
+        print(row[1])
     print_footer()
