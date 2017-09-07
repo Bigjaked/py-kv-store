@@ -15,21 +15,17 @@ if __name__ == '__main__':
     rd = RedisStore(redis.Redis(connection_pool=pool))
 
     benchmarks = [
-        'overhead',
-        'memcached',
-        'sqlite-mem',
-        'redis',
-        # 'sqlite-disk',
-        # 'tinydb',
+        # 'overhead',
+        # 'memcached',
+        # 'sqlite-mem',
+        # 'redis',
+        'sqlite-disk',
     ]
     its = 1000
-    cache_size = int(its / 1)
+    cache_size = 1000
 
     print_header(its)
     if 'overhead' in benchmarks:
-        db = DefaultDict()
-        bench(db, its, "'no evict functions'")
-
         db = CacheDummy()
         bench(db, its, "'pure overhead'")
 
@@ -59,11 +55,11 @@ if __name__ == '__main__':
 
     if 'sqlite-disk' in benchmarks:
         db_file = 'test-db.db'
-
         if os.path.isfile(db_file): os.remove(db_file)
         db = SqlitePersistentStore(db_file)
         bench(db, its)
 
+        db_file = 'test-db1.db'
         if os.path.isfile(db_file): os.remove(db_file)
         db = SqlitePersistentStore(db_file, cache=LRUCache(cache_size))
         bench(db, its, msg='LRUCache cache')
