@@ -7,13 +7,20 @@ Simple interface to a few key value stores
 Optional dependencies
 
 ujson_
-.. _msgpack-python: https://pypi.python.org/pypi/msgpack-python
+
+
 ``pip install msgpack-python``
 
+
 msgpack-python_
-.. _ujson: https://pypi.python.org/pypi/ujson
+
+
 `pip install ujson``
 
+
+.. _msgpack-python: https://pypi.python.org/pypi/msgpack-python
+
+.. _ujson: https://pypi.python.org/pypi/ujson
 
 Benchmarks
 ==========
