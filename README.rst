@@ -1,22 +1,22 @@
-----------------
+
 persist-kv-store
-################
+===============
 
 Simple interface to a few key value stores
 ------------------------------------------
 Optional dependencies
 
 ujson_
+.. _msgpack-python: https://pypi.python.org/pypi/msgpack-python
+``pip install msgpack-python``
 
-    ``pip install ujson``
 msgpack-python_
+.. _ujson: https://pypi.python.org/pypi/ujson
+`pip install ujson``
 
 
-    ``pip install msgpack-python``
-
-----------
 Benchmarks
-##########
+==========
 
 This is a baseline for the benchmarks, it represents the overhead of both the cache layer
 and the structure of the code.
@@ -64,5 +64,3 @@ These benchmarks are for the back ends that write to disk
 +-----------------------------------------+---------------+---------------+---------------+---------------+
 
 
-.. _msgpack-python::https://pypi.python.org/pypi/msgpack-python
-.. _ujson:: https://pypi.python.org/pypi/ujson
