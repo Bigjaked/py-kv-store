@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
-# import msgpack
-import ujson
 
-from pymemcache.client.base import Client
+from . import ujson  # might be builtin json (fallback)
+
+try:
+    from pymemcache.client.base import Client
+except ImportError:
+    raise ImportError('Could not import pymemcache.client.base.Client')
 
 from .cache import CacheMixin
-from .basestore import AbstractKvInterface
+from .basestore import KVBase
 
 def pack(key, value):
     # return msgpack.packb(value, use_bin_type=True), 1
@@ -18,27 +21,24 @@ def unpack(key, value, flags):
     return value
     # raise Exception(f'Unkown de-serialization flag {flags}')
 
-class MemcacheStore(AbstractKvInterface):
-    def __init__(self, host='127.0.0.1', port=11211):
+class MemcacheStore(KVBase, CacheMixin):
+    def __init__(self, host='127.0.0.1', port=11211, **kwargs):
+        CacheMixin.__init__(self, **kwargs)
         self._memcache = Client(
-            (host, port), serializer=pack, deserializer=unpack)
+            (host, port),
+            serializer=pack,
+            deserializer=unpack)
     def __del__(self):
         try:
             self._memcache.close()
-        except: pass
+        except:
+            pass
     def set(self, key, value):
         self._set_cached(key, value)
         self._memcache.set(key, value)
     def get(self, key):
         cached = self._get_cached(key)
-        if cached: return cached
+        if cached is not None: return cached
         return self._memcache.get(key, None)
-
-class MemcacheStoreWithCache(MemcacheStore, CacheMixin):
-    def __init__(self, **kwargs):
-        MemcacheStore.__init__(self)
-        CacheMixin.__init__(
-            self,
-            enabled=kwargs.get('cache', True),
-            limit=kwargs.get('limit', 1000),
-        )
+    __getitem__ = get
+    __setitem__ = set

@@ -3,8 +3,7 @@ import sqlite3
 from typing import Union
 from .serializer import KeyValueSerializer
 
-DEBUG = False
-class AbstractKvInterface(object):
+class KVBase(object):
     # Must be overwritten  in subclass
     def set(self, key, value): raise NotImplementedError
     def get(self, key): raise NotImplementedError
@@ -13,26 +12,27 @@ class AbstractKvInterface(object):
     # api convienience  methods
     def _get_cached(self, key):
         """standard cache get api"""
-        if hasattr(self, '_get_cache'):
-            return self._get_cache(key)
-        else:
-            return None
+        # Call getitem directly for max performance
+        # if there is no cache, the dummy class will return None
+        return self._cache.get(key)
     def _set_cached(self, key, value):
         """standard cache set api"""
-        if hasattr(self, '_set_cache'):
-            self._set_cache(key, value)
-    def __getitem__(self, item): return self.get(item)
-    def __setitem__(self, key, value): self.set(key, value)
+        # Call getitem directly for max performance
+        # if there is no cache, it will pass silently through the dummy class
+        self._cache.set(key, value)
 
-class SQLiteBase(AbstractKvInterface):
+    def __getitem__(self, item, **kwargs): raise NotImplementedError
+    def __setitem__(self, item, value, **kwargs): raise NotImplementedError
+
+class SQLiteBase(KVBase):
     _serializer = KeyValueSerializer()
     _key_value_schema = ('CREATE TABLE kv_store ('
                          '  k TEXT PRIMARY KEY,'
-                         '  v BLOB NOT NULL'
+                         '  v TEXT NOT NULL'
                          ');')
 
     def __init__(self, filename=':memory:', **kwargs):
-        AbstractKvInterface.__init__(self)
+        KVBase.__init__(self)
 
         self.lock = kwargs.get('lock', None)
         self.con = sqlite3.connect(filename, check_same_thread=False)
@@ -60,9 +60,6 @@ class SQLiteBase(AbstractKvInterface):
     def _insert(self, key_: str, value: bytes):
         q = "INSERT OR REPLACE INTO kv_store (k, v)" \
             " VALUES (:key_, :value);"
-        if DEBUG:
-            print(q.replace(':key_', key_).replace(
-                ':value', str(value)))
         if self.lock:
             with self.lock:
                 self.cur.execute(q, (key_, value))
@@ -72,7 +69,6 @@ class SQLiteBase(AbstractKvInterface):
             self.cur.execute(q, (key_, value))
     def _query(self, key_: str) -> Union[bytes, bool]:
         q = "SELECT v FROM kv_store WHERE k = :key_;"
-        if DEBUG: print(q.replace('key_', key_))
         if self.lock:
             with self.lock:
                 res = self.cur.execute(q, (key_,)).fetchone()
@@ -99,7 +95,6 @@ class SQLiteBase(AbstractKvInterface):
         except:
             pass
         try:
-            self.con.commit()
             self.con.close()
         except:
             pass

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from timeit import default_timer as clockit
+from timeit import default_timer
 from math import pi
 
 def fmt(val):
@@ -23,45 +23,60 @@ def fmt(val):
         else:
             return ' s', val
 
-def l_json(x, ln=50):
-    return {f'k-{n}': n * x for n in range(ln)}
+def l_dict(ln):
+    return {f'k-{n}': n for n in range(ln)}
 
-header = f'''
-{'':-<94}
-{' ':<30}|{'set and get float per/s':^31}|{'set and get 50 el dict per/s':^31}|
-{'':-<94}
-{'classname':<30}|{'sets p/s':^15}|{'gets p/s':^15}|{'sets p/s':^15}|{'gets p/s':^15}|
-{'':-<94}'''
+op = 'ops/s'
+sps = 'sets p/s'
+gps = 'gets p/s'
+sag = 'set and get '
+l_len = 105
+def print_header(its):
+    lps = str(its) + ' Iterations'
 
-pie = pi - 2
-def bench(db, its):
-    to_print = f'{db.__class__.__name__:<30}|'
-    st = clockit()
+    print(
+        f" {'':-<{l_len}}\n"
+        f"| {lps:^40}|{sag +'ints per/s':^31}|{sag + '50 el dict per/s':^31}|\n"
+        f" {'':-<{l_len}}\n"
+        f"| {'CLASSNAME':<40}|{sps:^15}|{gps:^15}|{sps:^15}|{gps:^15}|\n"
+        f" {'':-<{l_len}}"
+    )
+def print_footer():
+    print(f" {'':-<{l_len}}\n")
+
+def bench(db, its, msg='', ln=25):
+    # if not msg: msg = f'l={its}'
+    l_d = l_dict(25)
+    col_width = 7
+    rnd = 1
+
+    output_str = f'| {db.__class__.__name__ + " " + msg:<40}|'
+    st = default_timer()
     for i in range(0, its):
-        db.set(f'key-{i}', float(i) * pie)
-    et = clockit() - st
+        db.set(f'key-{i}', i)
+    et = default_timer() - st
     ps_s, ps = fmt(its / et)
-    to_print += f"{str(round(ps,2)) + ps_s + 'ops/s':^15}|"
+    output_str += f"{str(round(ps, rnd)):>{col_width}} {ps_s}{op} |"
 
-    st = clockit()
+    st = default_timer()
     for i in range(0, its):
-        db.get(f'key-{i}')
-    et = clockit() - st
+        _ = db.get(f'key-{i}')
+    et = default_timer() - st
     ps_s, ps = fmt(its / et)
-    to_print += f"{str(round(ps,2)) + ps_s + 'ops/s':^15}|"
+    output_str += f"{str(round(ps, rnd)):>{col_width}} {ps_s}{op} |"
 
     #   LONG SET AND GET
-    st = clockit()
+    st = default_timer()
     for i in range(0, its):
-        db.set(f'key-{i}', l_json(i))
-    et = clockit() - st
+        db.set(f'key-{i}', l_d)
+    et = default_timer() - st
     ps_s, ps = fmt(its / et)
-    to_print += f"{str(round(ps,2)) + ps_s + 'ops/s':^15}|"
+    output_str += f"{str(round(ps, rnd)):>{col_width}} {ps_s}{op} |"
 
-    st = clockit()
+    st = default_timer()
     for i in range(0, its):
-        db.get(f'key-{i}')
-    et = clockit() - st
+        _ = db.get(f'key-{i}')
+    et = default_timer() - st
     ps_s, ps = fmt(its / et)
-    to_print += f"{str(round(ps,2)) + ps_s + 'ops/s':^15}|"
-    print(to_print)
+    output_str += f"{str(round(ps, rnd)):>{col_width}} {ps_s}{op} |"
+    print(output_str)
