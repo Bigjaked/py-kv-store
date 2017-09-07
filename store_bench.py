@@ -16,10 +16,10 @@ if __name__ == '__main__':
 
     benchmarks = [
         # 'overhead',
-        # 'memcached',
-        # 'sqlite-mem',
-        # 'redis',
-        'sqlite-disk',
+        'memcached',
+        'sqlite-mem',
+        'redis',
+        # 'sqlite-disk',
     ]
     its = 1000
     cache_size = 1000

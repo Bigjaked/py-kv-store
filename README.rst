@@ -38,17 +38,17 @@ Here are a few benchmarks for the different memory based storage back ends
 +-----------------------------------------+---------------+---------------+---------------+---------------+
 |   CLASSNAME                             |   sets p/s    |   gets p/s    |   sets p/s    |   gets p/s    |
 +=========================================+===============+===============+===============+===============+
-| MemcacheStore                           |   47.5 Kops/s |   17.3 Kops/s |   40.4 Kops/s |   14.7 Kops/s |
+| MemcacheStore                           |   47.8 Kops/s |   15.4 Kops/s |   45.9 Kops/s |   16.3 Kops/s |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| MemcacheStore LRUCache cache            |   45.2 Kops/s |   31.4 Kops/s |   40.1 Kops/s |   30.5 Kops/s |
+| MemcacheStore LRUCache cache            |   44.7 Kops/s |  901.1 Kops/s |   42.1 Kops/s |  862.7 Kops/s |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| SqliteMemoryStore                       |   63.2 Kops/s |  158.7 Kops/s |   33.2 Kops/s |   90.0 Kops/s |
+| SqliteMemoryStore                       |   74.0 Kops/s |  178.9 Kops/s |   50.6 Kops/s |   91.2 Kops/s |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| SqliteMemoryStore LRUCache cache        |   62.2 Kops/s |  245.4 Kops/s |   30.8 Kops/s |  138.9 Kops/s |
+| SqliteMemoryStore LRUCache cache        |   69.4 Kops/s |  956.3 Kops/s |   46.7 Kops/s |    1.0 Mops/s |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| RedisStore                              |    2.8 Kops/s |    2.6 Kops/s |    2.6 Kops/s |    2.8 Kops/s |
+| RedisStore                              |    2.8 Kops/s |    3.0 Kops/s |    3.3 Kops/s |    3.2 Kops/s |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| RedisStore LRUCache cache               |    2.6 Kops/s |    5.1 Kops/s |    2.3 Kops/s |    5.8 Kops/s |
+| RedisStore LRUCache cache               |    3.0 Kops/s |  690.7 Kops/s |    2.9 Kops/s |  628.4 Kops/s |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
 
 These benchmarks are for the back ends that write to disk
