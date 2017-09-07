@@ -33,8 +33,9 @@ class SQLiteBase(KVBase):
 
     def __init__(self, filename=':memory:', **kwargs):
         KVBase.__init__(self)
-
-        self.lock = kwargs.get('lock', None)
+        self._since_last_commit = 0
+        self._batch_size = kwargs.get('batch_size', 100)
+        self.current_batch = []
         self.con = sqlite3.connect(filename, check_same_thread=False)
         self.cur = self.con.cursor()
         if not self._table_exists('kv_store'):
@@ -51,45 +52,44 @@ class SQLiteBase(KVBase):
         query = (
             "SELECT * FROM sqlite_master "
             "WHERE type='table' AND name=:name;")
-        if self.lock:
-            with self.lock:
-                res = self.cur.execute(query, (table_name,)).fetchall()
-        else:
-            res = self.cur.execute(query, (table_name,)).fetchall()
+        res = self.cur.execute(query, (table_name,)).fetchall()
         return bool(res)
     def _insert(self, key_: str, value: bytes):
+        # q = "INSERT OR REPLACE INTO kv_store (k, v)" \
+        #     " VALUES (:key_, :value);"
+        # self.cur.execute(q, (key_, value))
+
+        # self._since_last_commit += 1
+        # if self._since_last_commit > self._batch_size:
+
+        self.current_batch.append((key_, value))
+        if not len(self.current_batch) < self._batch_size:
+            self._insert_many(self.current_batch)
+            self.commit()
+            self.current_batch = []
+    def _insert_many(self, batch: [(str, str), ...]):
+        values = tuple("('{}','{}')".format(k, v) for k, v in batch)
         q = "INSERT OR REPLACE INTO kv_store (k, v)" \
-            " VALUES (:key_, :value);"
-        if self.lock:
-            with self.lock:
-                self.cur.execute(q, (key_, value))
-                self.con.commit()
-        else:
-            self.con.commit()
-            self.cur.execute(q, (key_, value))
+            " VALUES %s;" % ','.join(values)
+        self.cur.execute(q)
+        self.commit()
     def _query(self, key_: str) -> Union[bytes, bool]:
         q = "SELECT v FROM kv_store WHERE k = :key_;"
-        if self.lock:
-            with self.lock:
-                res = self.cur.execute(q, (key_,)).fetchone()
-        else:
-            res = self.cur.execute(q, (key_,)).fetchone()
-        try:
-            return res[0]
-        except:
-            return False
+        res = self.cur.execute(q, (key_,)).fetchone()
+        return self._get_result(res)
     def _count(self) -> int:
         q = "SELECT count(1) FROM kv_store;"
-        # if self.lock:
-        with self.lock:
-            res = self.cur.execute(q).fetchone()
-        # else:
-        #     res = self.cur.execute(q).fetchone()
-        try:
-            return self._get_result(res)
-        except:
-            return False
+        res = self.cur.execute(q).fetchone()
+        return self._get_result(res)
+    def commit(self):
+        self.con.commit()
+        self._since_last_commit = 0
+
     def __del__(self):
+        try:
+            self.con.commit()
+        except:
+            pass
         try:
             self.cur.close()
         except:

@@ -5,6 +5,7 @@ from .basestore import SQLiteBase
 
 class SqlitePersistentStore(SQLiteBase, CacheMixin):
     def __init__(self, filename, **kwargs):
+
         SQLiteBase.__init__(self, filename=filename)
         CacheMixin.__init__(self, **kwargs)
     def set(self, key, value):

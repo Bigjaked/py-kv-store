@@ -18,8 +18,10 @@ class SqliteMemoryStore(SQLiteBase, CacheMixin):
             return self._serializer.unserialize(packed)
         return None
     def __del__(self):
-        self.cur.close()
-        self.con.commit()
-        self.con.close()
+        try:
+            self.cur.close()
+            self.con.close()
+        except:
+            pass
     __getitem__ = get
     __setitem__ = set
