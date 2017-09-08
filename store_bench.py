@@ -21,23 +21,19 @@ if __name__ == '__main__':
     benchmarks = [
         'overhead',
         # 'memcached',
-        'sqlite-mem',
+        # 'sqlite-mem',
         # 'redis',
         'vedis',
         # 'sqlite-disk',
     ]
     run_cached = True
-    its = 10000
-    cache_size = 100
+    its = 100000
+    cache_size = int(its / 10)
     bench_set = []
     ba = bench_set.append
     print_header(its)
     if 'vedis' in benchmarks:
         from vedis import Vedis
-
-        db = Vedis(':mem:')
-        ba(bench(db, its))
-
         db = Vedis(':mem:')
         ba(bench(db, its, method='[]'))
 
@@ -46,14 +42,15 @@ if __name__ == '__main__':
         ba(bench(db, its, method='[]'))
     if 'overhead' in benchmarks:
         db = CacheDummy()
-        ba(bench(db, its, "'pure overhead'"))
-
-        db = CacheDummy()
         ba(bench(db, its, "'pure overhead'", method='[]'))
-
+        print_footer()
         db = LRUCache(cache_size)
         ba(bench(db, its, "'subclassed OrderedDict'"))
-
+        db = LRUCache(cache_size)
+        ba(bench(db, its, "'subclassed OrderedDict'"))
+        db = LRUCache(cache_size)
+        print_footer()
+        ba(bench(db, its, "'subclassed OrderedDict'", method='[]'))
         db = LRUCache(cache_size)
         ba(bench(db, its, "'subclassed OrderedDict'", method='[]'))
 
@@ -74,11 +71,11 @@ if __name__ == '__main__':
         rm_file(db_file)
         db = SqlitePersistentStore(db_file)
         ba(bench(db, its))
-
-        print('\nsorted table\n')
-
-        print_header(its)
-
-        for row in reversed(sorted(bench_set, key=lambda x: x[0])):
-            print(row[1])
-        print_footer()
+    print_footer()
+    # print('\nsorted table\n')
+    #
+    # print_header(its)
+    #
+    # for row in reversed(sorted(bench_set, key=lambda x: x[0])):
+    #     print(row[1])
+    # print_footer()
