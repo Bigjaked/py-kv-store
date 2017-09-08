@@ -59,10 +59,7 @@ class SQLiteBase(KVBase):
     def _insert_many(self, batch: [str, ...]):
         self.cur.execute(self._sql_begin)
         self.cur.executemany(self._sql_insert_many, batch)
-        try:
-            self.cur.execute(self._sql_end)
-        except OperationalError:
-            pass
+        self.cur.execute(self._sql_end)
         self.commit()
     def _query(self, key_: str) -> Union[bytes, bool]:
         self.flush(True)

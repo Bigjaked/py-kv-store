@@ -46,7 +46,7 @@ def print_header(its):
 def print_footer():
     print("+-{s:-^40}+{s:-^15}+{s:-^15}+{s:-^15}+{s:-^15}|".format(s=''))
 
-def bench(db, its, msg='', ln=25):
+def bench(db, its, msg='', ln=25, method='set'):
     # if not msg: msg = f'l={its}'
     l_d = l_dict(25)
     dbn = db.__class__.__name__
@@ -55,8 +55,12 @@ def bench(db, its, msg='', ln=25):
     output_str_2 = ''
     output_str = '| {:<40}|'.format(dbn + ' ' + msg)
     st = default_timer()
-    for i in range(0, its):
-        db.set('key-{i}'.format(i=i), i)
+    if method == 'set':
+        for i in range(0, its):
+            db.set('key-{i}'.format(i=i), i)
+    elif method == '[]':
+        for i in range(0, its):
+            db['key-{i}'.format(i=i)] = i
     et = default_timer() - st
     index_1 = its / et
     ps_s, ps_ = fmt(its / et)
@@ -71,8 +75,12 @@ def bench(db, its, msg='', ln=25):
         ps_s=po_s, col_width=col_width,
     )
     st = default_timer()
-    for i in range(0, its):
-        _ = db.get('key-{i}'.format(i=i))
+    if method == 'set':
+        for i in range(0, its):
+            _ = db.get('key-{i}'.format(i=i))
+    elif method == '[]':
+        for i in range(0, its):
+            _ = db['key-{i}'.format(i=i)]
     et = default_timer() - st
     index_2 = its / et
     ps_s1, ps_1 = fmt(its / et)
