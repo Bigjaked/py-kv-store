@@ -64,3 +64,34 @@ These benchmarks are for the back ends that write to disk
 +-----------------------------------------+---------------+---------------+---------------+---------------+
 
 
+Tests on an odroid-c1+ (raspberry-pi-3 equivilent)
+python 3.5.2
++-----------------------------------------+---------------+---------------+---------------+---------------+
+| CLASSNAME        10000 Iterations       |  sets per/s   |  gets per/s   |  sec per set  |  sec per get  |
++=========================================+===============+===============+===============+===============+
+| CacheDummy 'pure overhead'              |   154.13 K    |   157.98 K    |    6.49 us    |    6.33 us    |
+| LRUCache 'subclassed OrderedDict'       |    56.81 K    |    80.05 K    |   17.60 us    |   12.49 us    |
+| SqliteMemoryStore                       |    15.34 K    |    13.00 K    |   65.20 us    |   76.91 us    |
+| SqliteMemoryStore  w/lru cache          |    12.88 K    |    12.42 K    |   77.65 us    |   80.51 us    |
+| SqlitePersistentStore  w/lru cache      |     3.78 K    |     7.05 K    |  264.64 us    |  141.77 us    |
+| SqlitePersistentStore                   |     2.79 K    |     6.97 K    |  358.93 us    |  143.54 us    |
+| MemcacheStore                           |     5.62 K    |     2.71 K    |  177.78 us    |  369.15 us    |
+| MemcacheStore  w/lru cache              |     5.04 K    |     2.79 K    |  198.55 us    |  358.33 us    |
+| RedisStore  w/lru cache                 |     1.77 K    |     2.12 K    |  565.97 us    |  471.79 us    |
+| RedisStore                              |     1.85 K    |     1.99 K    |  540.46 us    |  501.96 us    |
++-----------------------------------------+---------------+---------------+---------------+---------------+
+
++-----------------------------------------+---------------+---------------+---------------+---------------+
+| CLASSNAME        10000 Iterations       |  sets per/s   |  gets per/s   |  sec per set  |  sec per get  |
++=========================================+===============+===============+===============+===============+
+| CacheDummy 'pure overhead'              |   115.89 K    |   117.25 K    |    8.63 us    |    8.53 us    |
+| LRUCache 'subclassed OrderedDict'       |    53.61 K    |    61.11 K    |   18.65 us    |   16.36 us    |
+| SqliteMemoryStore  w/lru cache          |     7.70 K    |     9.13 K    |  129.81 us    |  109.55 us    |
+| SqliteMemoryStore                       |     8.17 K    |     4.43 K    |  122.47 us    |  225.64 us    |
+| SqlitePersistentStore  w/lru cache      |     3.30 K    |     5.80 K    |  302.89 us    |  172.54 us    |
+| SqlitePersistentStore                   |     3.29 K    |     5.13 K    |  303.91 us    |  194.81 us    |
+| MemcacheStore                           |     4.47 K    |     3.34 K    |  223.76 us    |  299.75 us    |
+| MemcacheStore  w/lru cache              |     4.10 K    |     3.53 K    |  243.84 us    |  283.13 us    |
+| RedisStore  w/lru cache                 |     2.47 K    |     3.04 K    |  404.77 us    |  328.59 us    |
+| RedisStore                              |     1.83 K    |     2.57 K    |  546.90 us    |  388.57 us    |
++-----------------------------------------+---------------+---------------+---------------+---------------|

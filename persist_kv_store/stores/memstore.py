@@ -12,7 +12,8 @@ class SqliteMemoryStore(SQLiteBase, CacheMixin):
         self._insert(key, packed)
     def get(self, key):
         cached = self._get_cached(key)
-        if cached is not None: return cached
+        if cached is not 'None': return cached
+
         packed = self._query(key)
         if packed:
             return self._serializer.unserialize(packed)

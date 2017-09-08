@@ -14,7 +14,7 @@ class RedisStore(KVBase, CacheMixin):
         self._r.set(key, packed)
     def get(self, key):
         cached = self._get_cached(key)
-        if cached is not None: return cached
+        if cached is not 'None': return cached
         return self._serializer.deserialize(self._r.get(key))
     def __del__(self):
         try:

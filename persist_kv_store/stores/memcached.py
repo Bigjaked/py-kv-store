@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 from . import ujson  # might be builtin json (fallback)
 
 try:
@@ -38,7 +36,7 @@ class MemcacheStore(KVBase, CacheMixin):
         self._memcache.set(key, value)
     def get(self, key):
         cached = self._get_cached(key)
-        if cached is not None: return cached
+        if cached is not 'None': return cached
         return self._memcache.get(key, None)
     __getitem__ = get
     __setitem__ = set
