@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sqlite3
+from sqlite3 import OperationalError
 from typing import Union
 from .serializer import KeyValueSerializer
 
@@ -57,7 +58,10 @@ class SQLiteBase(KVBase):
     def _insert_many(self, batch: [str, ...]):
         self.cur.execute(self._sql_begin)
         self.cur.executemany(self._sql_insert_many, batch)
-        self.cur.execute(self._sql_end)
+        try:
+            self.cur.execute(self._sql_end)
+        except OperationalError:
+            pass
         self.commit()
     def _query(self, key_: str) -> Union[bytes, bool]:
         self.flush(True)
