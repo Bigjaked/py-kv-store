@@ -46,7 +46,8 @@ class SQLiteBase(KVBase):
         return bool(self.cur.execute(
             self._sql_table_exists, (table_name,)).fetchall())
     def flush(self, force=False):
-        if force or self._current_batch_len >= self._batch_size:
+        if force and self.current_batch or \
+                self._current_batch_len >= self._batch_size:
             self._insert_many(self.current_batch)
             self.commit()
             self.current_batch = []
