@@ -18,8 +18,9 @@ python 3.5+ but 3.2+ and 2.7 shouldn't require many changes
 
 - cython install with
 
-::
-    ``pip install cython``
+.. code-block:: shell
+
+    pip install cython
 
 **Optional dependencies**
 
@@ -27,13 +28,15 @@ python 3.5+ but 3.2+ and 2.7 shouldn't require many changes
 
 .. _ujson: https://pypi.python.org/pypi/ujson
 
-::
-    ``pip install ujson``
+.. code-block:: shell
+
+    pip install ujson
 
 To install, download or clone (unzip if downloaded)
 cd into the package folder and run
 
-::
+.. code-block:: shell
+
     python setup.py build_ext --inplace
 
 
@@ -69,7 +72,8 @@ Benchmarks
 
 Here is an example of how each benchmark is run
 
-::
+.. code-block:: python
+
     from timeit import default_timer()
 
     # time writes
@@ -89,6 +93,8 @@ Main storage is a Samsung 950 PRO 512GB (over 2000 Mbps read/write)
 
 
 No batching (except for sqlitePersistentStore)
+
+
 +-----------------------------------------+---------------+---------------+---------------+---------------+
 | CLASSNAME       1000000 Iterations      |  sets per/s   |  gets per/s   |  sec per set  |  sec per get  |
 +=========================================+===============+===============+===============+===============+
