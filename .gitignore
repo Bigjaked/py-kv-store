@@ -19,3 +19,5 @@ __pycache__/
 *.cmd
 *.json
 *.c
+/persist_kv_store/persist_kv_store/
+!/persist_kv_store/build/

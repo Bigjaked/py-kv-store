@@ -7,6 +7,7 @@ from collections import OrderedDict
 from . import DEFAULT_CACHE_LIMIT
 
 cdef str none = 'None'
+
 class DefaultDict:
     def set(self, str key, object value):
         self[key] = value
@@ -27,9 +28,6 @@ cdef class CacheDummy:
     def __getitem__(self, str key): return none
     cpdef str _get(self, str key): return none
     cpdef str get(self, str key): return none
-
-# TODO: Create FIFOCache with OrderedDict
-# TODO: performance of FIFOCache should be better than LRUCache
 
 cdef class LRUCache:
     cdef object _cache
@@ -54,18 +52,17 @@ cdef class LRUCache:
         # self._cache[key] = value
         self._cache.__setitem__(key, value)
     cdef object _get(self, str key):
-        cdef object v
-        try:
-            # v = self._cache[key]
-            v = self._cache.__getitem__(key)
+        if key in self._cache:
             self._cache.move_to_end(key)
-            return v
-        except KeyError:
+            return self._cache.__getitem__(key)
+        else:
             return none
+
     cpdef set(self, str key, object value):
         self._set(key, value)
     cpdef object get(self, str key):
         return self._get(key)
+
     def __getitem__(self, str key):
         return self._get(key)
     def __setitem__(self, str key, object value):
@@ -77,27 +74,10 @@ cdef class CacheMixin:
     def __init__(self, **kwargs):
         limit = kwargs.get('limit', DEFAULT_CACHE_LIMIT)
         self._cache = LRUCache(limit)
-        # cache = kwargs.get('cache', none)
-        # if cache is not none:
-        #     # enable any dict like object as a cache
-        #     if hasattr(cache, '__setitem__') and \
-        #         hasattr(cache, '__getitem__'):
-        #         self._cache = cache
-        #     else:
-        #         cdef LRUCache _cache
-        #         self._cache = LRUCache(
-        # else:
-        #     cdef CacheDummy _cache
-        #     # dummy cache to satisfy api
-        #     self._cache = CacheDummy()
     # api convienience  methods
     cpdef object _get_cached(self, str key):
         """standard cache get api"""
-        # Call getitem directly for max performance
-        # if there is no cache, the dummy class will return None
         return self._cache._get(key)
     cpdef _set_cached(self, str key, object value):
         """standard cache set api"""
-        # Call getitem directly for max performance
-        # if there is no cache, it will pass silently through the dummy class
         self._cache._set(key, value)

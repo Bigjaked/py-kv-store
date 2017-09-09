@@ -15,10 +15,14 @@ from .cache import LRUCache, DefaultDict, CacheDummy, CacheMixin
 
 from .serializer import KeyValueSerializer
 
+
+from .memstore import SqliteMemoryStore
+from .persiststore import SqlitePersistentStore
+
+from .redisstore import RedisStore
+
+
 try:
     from .memcached import MemcacheStore
 except ImportError:
-    print()
-from .memstore import SqliteMemoryStore
-from .redisstore import RedisStore
-from .persiststore import SqlitePersistentStore
+    print('pymemcache is required for the memcache adapter')

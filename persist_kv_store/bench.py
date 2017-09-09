@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from timeit import default_timer
-from math import pi
 
 def fmt(val):
     if val > 1:
@@ -23,8 +22,6 @@ def fmt(val):
         else:
             return ' s', val
 
-def l_dict(ln):
-    return {'k-{n}'.format(n=n): n for n in range(ln)}
 
 op = ''
 po = ''
@@ -44,27 +41,21 @@ def print_header(its):
             s='', lps=lps, sps=sps, gps=gps, sps_=sps_, gps_=gps_)
     )
 def print_footer():
-    print("+-{s:-^40}+{s:-^15}+{s:-^15}+{s:-^15}+{s:-^15}|".format(s=''))
+    print("+-{s:-^40}+{s:-^15}+{s:-^15}+{s:-^15}+{s:-^15}+".format(s=''))
 
-def bench(db, its, msg='', ln=25, method='set'):
-    # if not msg: msg = f'l={its}'
-    l_d = l_dict(25)
+def bench(db, its, msg=''):
+    """don't judge me, i blame the new f-strings for spoiling me"""
     dbn = db.__class__.__name__
     col_width = 10
     rnd = 2
     output_str_2 = ''
     output_str = '| {:<40}|'.format(dbn + ' ' + msg)
     st = default_timer()
-    if method == 'set':
-        for i in range(0, its):
-            db.set('key-{i}'.format(i=i), i)
-    elif method == '[]':
-        for i in range(0, its):
-            db['key-{i}'.format(i=i)] = i
+    for i in range(0, its):
+        db['key-{i}'.format(i=i)] = i
     et = default_timer() - st
     index_1 = its / et
     ps_s, ps_ = fmt(its / et)
-    # output_str_2 += " {f'{po_:.{rnd}f} '+po_s:>{col_width}}    |"
     output_str += " {:>{col_width}}    |".format(
         "{ps_:.{rnd}f} {ps_s}".format(ps_=ps_, rnd=rnd, ps_s=ps_s),
         ps_s=ps_s, col_width=col_width,
@@ -75,26 +66,19 @@ def bench(db, its, msg='', ln=25, method='set'):
         ps_s=po_s, col_width=col_width,
     )
     st = default_timer()
-    if method == 'set':
-        for i in range(0, its):
-            _ = db.get('key-{i}'.format(i=i))
-    elif method == '[]':
-        for i in range(0, its):
-            _ = db['key-{i}'.format(i=i)]
+
+    for i in range(0, its):
+        _ = db['key-{i}'.format(i=i)]
     et = default_timer() - st
     index_2 = its / et
     ps_s1, ps_1 = fmt(its / et)
-    # output_str += f" {f'{ps_1:.{rnd}f} '+ps_s1:>{col_width}}    |"
     po_s1, po_1 = fmt(et / its)
-    # output_str_2 += f" {f'{po_1:.{rnd}f} '+po_s1:>{col_width}}    |"
     output_str += " {:>{col_width}}    |".format(
         "{ps_:.{rnd}f} {ps_s}".format(ps_=ps_1, rnd=rnd, ps_s=ps_s1),
         ps_s=ps_s1, col_width=col_width,
     )
-    po_s, po_ = fmt(et / its)
     output_str_2 += " {:>{col_width}}    |".format(
         "{ps_:.{rnd}f} {ps_s}".format(ps_=po_1, rnd=rnd, ps_s=po_s1),
         ps_s=po_s1, col_width=col_width,
     )
-    print(output_str + output_str_2)
     return (index_1 + index_2) / 2, output_str + output_str_2
