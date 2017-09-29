@@ -88,7 +88,7 @@ Here is an example of how each benchmark is run
     get_time = default_timer() - get_start
 
 Benchmark was run on a MSI GS60 PRO-4k 32GB RAM, i7-6700HQ @ 2.6Ghz TB to 3.1Ghz
-Main storage is a Samsung 950 PRO 512GB (over 2000 Mbps read/write)
+Main storage is a Samsung 950 PRO 512GB (over 2000 MB/s read/write)
 
 
 No batching (except for sqlitePersistentStore)
