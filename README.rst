@@ -1,5 +1,4 @@
-python key value kit
-====================
+
 
 Simple interface to a few key value stores
 ------------------------------------------
@@ -85,7 +84,7 @@ Here is an example of how each benchmark is run
     # time reads
     get_start = default_timer()
     for i in range(0, its):
-        db['key-{i}'.format(i=i)] = i
+        a = db['key-{i}'.format(i=i)]
     get_time = default_timer() - get_start
 
 Benchmark was run on a MSI GS60 PRO-4k 32GB RAM, i7-6700HQ @ 2.6Ghz TB to 3.1Ghz
