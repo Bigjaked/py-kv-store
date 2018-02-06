@@ -11,4 +11,12 @@ ext_modules = [
     Extension("persist_kv_store.stores.serializer", ["stores/serializer.py"]),
 ]
 
-setup(name="persist_kv_store", ext_modules=cythonize(ext_modules))
+setup(
+    name="Persist-KV",
+    version=0.9,
+    description="Python key value persistance mechanism",
+    author='Jacob Duncan',
+    author_email='jacob.duncan@truepowere.com',
+    packages=['persist_kv_store'],
+    url='https://github.com/Bigjaked/py-kv-store',
+    ext_modules=cythonize(ext_modules))
