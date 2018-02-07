@@ -5,7 +5,7 @@ from Cython.Build import cythonize
 VERSION = '0.9'
 ext_modules = [
     Extension("persist_kv_store.stores.cache.cache",
-              ["persist_kv_store\\stores\\cache\\cache.pyx"]),
+              ["persist_kv_store\\stores\\cache\\cache.c"]),
     Extension("persist_kv_store.stores.basestore",
               ["persist_kv_store\\stores\\basestore.py"]),
     Extension("persist_kv_store.stores.memstore",
