@@ -77,8 +77,8 @@ Here is an example of how each benchmark is run
         a = db['key-{i}'.format(i=i)]
     get_time = default_timer() - get_start
 
-Benchmark was run on a MSI GS60 PRO-4k 32GB RAM, i7-6700HQ @ 2.6Ghz TB to 3.1Ghz
-Main storage is a Samsung 950 PRO 512GB (over 2000 MB/s read/write)
+Benchmark was run on a MSI GS60 PRO-4k 32GB DDR4, i7-6700HQ
+Main storage is a Samsung 950 PRO 512GB (2500 MB/s Read 1500 MB/s write)
 
 
 No batching (except for sqlitePersistentStore)
