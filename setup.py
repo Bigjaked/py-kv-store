@@ -2,7 +2,7 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Build import cythonize
 
-VERSION = '0.91'
+VERSION = '0.92'
 
 # f_type = '.py'
 f_type = '.c'

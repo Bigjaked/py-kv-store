@@ -28,13 +28,20 @@ class SQLiteBase(KVBase):
     def __init__(self, filename=':memory:', **kwargs):
         KVBase.__init__(self)
         self._since_last_commit = 0
-        self._batch_size = kwargs.get('batch_size', 100)
+        self._batch_size = kwargs.get('batch_size', 1)
+        self._lock = kwargs.get('lock', None)
         self.current_batch = []
         self._current_batch_len = 0
         self.con = sqlite3.connect(filename, check_same_thread=False)
         self.cur = self.con.cursor()
         if not self._table_exists('kv_store'):
             res = self.cur.execute(self._key_value_schema)
+    def _acquire_lock(self):
+        if self._lock is not None:
+            self._lock.acquire()
+    def _release_lock(self):
+        if self._lock is not None:
+            self._lock.release()
     @staticmethod
     def _get_result(executed_query):
         try:
@@ -53,14 +60,18 @@ class SQLiteBase(KVBase):
             self.current_batch = []
             self._current_batch_len = 0
     def _insert(self, key_: str, value):
+        self._acquire_lock()
         self.current_batch.append((key_, value))
         self._current_batch_len += 1
         self.flush()
+        self._release_lock()
     def _insert_many(self, batch: [str, ...]):
+        self._acquire_lock()
         self.cur.execute(self._sql_begin)
         self.cur.executemany(self._sql_insert_many, batch)
         self.cur.execute(self._sql_end)
         self.commit()
+        self._release_lock()
     def _query(self, key_: str) -> Union[bytes, bool]:
         self.flush(True)
         res = self.cur.execute(

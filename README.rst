@@ -16,23 +16,10 @@ python 3.5+
 
 **build dependencies**
 
-- cython install with
+- cython
+- ujson (optional)
 
-.. code-block:: shell
-
-    pip install cython
-
-**Optional dependencies**
-
-- ujson_  can be installed with
-
-.. _ujson: https://pypi.python.org/pypi/ujson
-
-.. code-block:: shell
-
-    pip install ujson
-
-To install
+Install with:
 
 .. code-block:: shell
 
@@ -58,6 +45,20 @@ Supported Key Stores
 
 
 - Python OrderedDict subclass
+
+
+Examples
+========
+
+.. code-block:: python
+    >>>from persist_kv_store.stores import SqliteMemoryStore
+
+    >>>db = SqliteMemoryStore()
+
+    >>>db['whatever-ascii-key-you-want'] = dict(can_i_use_dicts=True)
+    >>>db['234234'] = 3
+    >>>db['booleans'] = True
+
 
 
 Benchmarks
