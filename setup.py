@@ -24,6 +24,6 @@ setup(
     description="Python key value persistance mechanism",
     author='Jacob Duncan',
     author_email='jacob.duncan@truepowere.com',
-    packages=['persist_kv_store', 'persist_kv_store\\stores'],
+    packages=['persist_kv_store'],
     url='https://github.com/Bigjaked/py-kv-store/raw/master/persist_kv_store.zip',
     ext_modules=cythonize(ext_modules))
