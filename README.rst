@@ -2,7 +2,12 @@
 
 Simple interface to a few key value stores
 ------------------------------------------
-This is mainly just me playing around with git, reST, python packages, databases and cython.
+This is mainly just me playing around with git, reST, python packages, and cython; but it is also
+a fully functioning key value store with both memory and disk implementations using sqlite and some
+other key value stores.
+
+All storage back ends have dict-like interfaces as well as a default LRU cache based off of
+OrderedDict.
 
 
 Installation
@@ -27,8 +32,7 @@ python 3.5+
 
     pip install ujson
 
-To install, download or clone (unzip if downloaded)
-cd into the package folder and run
+To install
 
 .. code-block:: shell
 
