@@ -3,15 +3,11 @@
 Simple interface to a few key value stores
 ------------------------------------------
 This is mainly just me playing around with git, reST, python packages, databases and cython.
-None of this code runs anything in production, in fact, if anything, its just a bunch of
-diferent database adapters thrown together in a package with a simple but fast LRU Cache based on
-collections.OrderedDict
-glued in with some crappy cython...
 
 
 Installation
 ============
-python 3.5+ but 3.2+ and 2.7 shouldn't require many changes
+python 3.5+
 
 **build dependencies**
 
@@ -36,17 +32,11 @@ cd into the package folder and run
 
 .. code-block:: shell
 
-    python setup.py build_ext --inplace
+    pip install https://github.com/Bigjaked/py-kv-store/raw/master/dist/persist_kv_store-0.91.tar.gz
 
 
 Supported Key Stores
 --------------------
-
-- vedis_ via an `unofficial python adapter`_
-
-    .. _vedis: https://vedis.symisc.net/
-
-    .. _unofficial python adapter: https://github.com/coleifer/vedis-python
 
 - memcached_ via pymemcache_
 
@@ -63,7 +53,7 @@ Supported Key Stores
 - sqlite3 (memory and disk)
 
 
-- Python OrderedDict subclass (faster than you would think)
+- Python OrderedDict subclass
 
 
 Benchmarks
@@ -73,7 +63,7 @@ Here is an example of how each benchmark is run
 
 .. code-block:: python
 
-    from timeit import default_timer()
+    from timeit import default_timer
 
     # time writes
     set_start = default_timer()
