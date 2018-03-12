@@ -3,12 +3,12 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 
 
-VERSION = '0.92'
+VERSION = '0.93'
 
 # uncomment .pyx for building
-f_type = '.pyx'
+# f_type = '.pyx'
 # uncomment .c for packaging
-# f_type = '.c'
+f_type = '.c'
 
 # to compile from cython for build purposes
 # comment out the like above this and uncomment
