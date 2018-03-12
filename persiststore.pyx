@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from .cache import CacheMixin
-from .basestore import SQLiteBase
+# from . import CacheMixin
+from . import SQLiteBase
 
-class SqlitePersistentStore(SQLiteBase, CacheMixin):
+class SqlitePersistentStore(SQLiteBase):
     def __init__(self, filename, **kwargs):
 
         SQLiteBase.__init__(self, filename=filename)
-        CacheMixin.__init__(self, **kwargs)
+        # CacheMixin.__init__(self, **kwargs)
     def set(self, key, value):
         self._set_cached(key, value)
         packed = self._serializer.serialize(value)

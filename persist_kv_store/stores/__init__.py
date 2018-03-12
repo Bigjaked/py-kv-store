@@ -2,6 +2,7 @@
 
 from .config import *
 
+
 try:
     import ujson
 except ImportError:
@@ -9,18 +10,12 @@ except ImportError:
     print("For a performance increase 'pip install ujson' ")
     import json as ujson
 
-from .basestore import KVBase, SQLiteBase
-
+from .basestore import SQLiteBase
 from .cache import LRUCache, DefaultDict, CacheDummy, CacheMixin
-
 from .serializer import KeyValueSerializer
-
-
-from .memstore import SqliteMemoryStore
-from .persiststore import SqlitePersistentStore
-
-from .redisstore import RedisStore
-
+# from .memstore import SqliteMemoryStore
+# from .persiststore import SqlitePersistentStore
+# from .redisstore import RedisStore
 
 try:
     from .memcached import MemcacheStore

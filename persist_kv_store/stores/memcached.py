@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from . import ujson  # might be builtin json (fallback)
 
+
 try:
     from pymemcache.client.base import Client
 except ImportError:
     raise ImportError('Could not import pymemcache.client.base.Client')
 
 from .cache import CacheMixin
-from .basestore import KVBase
+
 
 def pack(key, value):
     # return msgpack.packb(value, use_bin_type=True), 1
@@ -19,13 +20,13 @@ def unpack(key, value, flags):
     return value
     # raise Exception(f'Unkown de-serialization flag {flags}')
 
-class MemcacheStore(KVBase, CacheMixin):
+class MemcacheStore(CacheMixin):
     def __init__(self, host='127.0.0.1', port=11211, **kwargs):
         CacheMixin.__init__(self, **kwargs)
         self._memcache = Client(
-            (host, port),
-            serializer=pack,
-            deserializer=unpack)
+          (host, port),
+          serializer=pack,
+          deserializer=unpack)
     def __del__(self):
         try:
             self._memcache.close()

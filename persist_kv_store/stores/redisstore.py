@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
-from .basestore import KVBase
 from .cache import CacheMixin
 from .serializer import KeyValueSerializer
 
-class RedisStore(KVBase, CacheMixin):
+
+class RedisStore(CacheMixin):
     _serializer = KeyValueSerializer()
     def __init__(self, redis_con, **kwargs):
         CacheMixin.__init__(self, **kwargs)
