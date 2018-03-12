@@ -1,5 +1,3 @@
-
-
 Simple interface to a few key value stores
 ------------------------------------------
 This is mainly just me playing around with git, reST, python packages, and cython; but it is also
@@ -29,20 +27,9 @@ Install with:
 Supported Key Stores
 --------------------
 
-- memcached_ via pymemcache_
-
-    .. _pymemcache: https://github.com/pinterest/pymemcache
-
-    .. _memcached: https://memcached.org/
-
-- redis_ via the `official adapter`_
-
-    .. _redis: https://redis.io/
-
-    .. _official adapter: https://github.com/andymccurdy/redis-py
+- Vedis (memory and disk)
 
 - sqlite3 (memory and disk)
-
 
 - Python OrderedDict subclass
 
@@ -86,29 +73,23 @@ Benchmark was run on a MSI GS60 PRO-4k 32GB DDR4, i7-6700HQ
 Main storage is a Samsung 950 PRO 512GB (2500 MB/s Read 1500 MB/s write)
 
 
-No batching (except for sqlitePersistentStore)
-
 
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| CLASSNAME       1000000 Iterations      |  sets per/s   |  gets per/s   |  sec per set  |  sec per get  |
+| CLASSNAME       100000 Iterations       |  sets per/s   |  gets per/s   |  sec per set  |  sec per get  |
 +=========================================+===============+===============+===============+===============+
-| CacheDummy 'pure overhead'              |     2.40 M    |     2.38 M    |  416.89 ns    |  420.90 ns    |
+| CacheDummy 'pure overhead'              |     2.40 M    |     4.60 M    |  417.14 ns    |  217.36 ns    |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| LRUCache evict_after=1000               |     1.11 M    |     2.04 M    |  898.27 ns    |  491.15 ns    |
+| LRUCache evict_after=1000 keys          |     1.29 M    |     3.08 M    |  773.63 ns    |  324.68 ns    |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| LRUCache evict_after=10000              |     1.06 M    |     2.03 M    |  945.26 ns    |  493.69 ns    |
+| LRUCache evict_after=10000 keys         |     1.20 M    |     3.00 M    |  832.32 ns    |  333.22 ns    |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| LRUCache evict_after=100000             |   981.33 K    |     1.72 M    |    1.02 us    |  580.75 ns    |
+| LRUCache evict_after=100 keys           |     1.17 M    |     2.75 M    |  852.93 ns    |  364.18 ns    |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| Vedis     in memory                     |   398.76 K    |   462.32 K    |    2.51 us    |    2.16 us    |
+| LRU                                     |     1.37 M    |     2.14 M    |  727.29 ns    |  467.91 ns    |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| Vedis     on disk                       |   125.85 K    |   210.57 K    |    7.95 us    |    4.75 us    |
+| SQLiteBase evict_after=1000.0 keys      |    39.06 K    |     3.28 M    |   25.60 us    |  304.63 ns    |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| SqliteMemoryStore                       |    80.04 K    |   139.16 K    |   12.49 us    |    7.19 us    |
+| Vedis Memory                            |   863.30 K    |     1.29 M    |    1.16 us    |  773.26 ns    |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-| MemcacheStore                           |    44.70 K    |    19.00 K    |   22.37 us    |   52.63 us    |
-+-----------------------------------------+---------------+---------------+---------------+---------------+
-| SqlitePersistentStore                   |     6.57 K    |    26.51 K    |  152.32 us    |   37.73 us    |
-+-----------------------------------------+---------------+---------------+---------------+---------------+
-| RedisStore                              |     3.00 K    |     3.12 K    |  333.61 us    |  320.66 us    |
+| Vedis Disk                              |   216.52 K    |   467.21 K    |    4.62 us    |    2.14 us    |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
