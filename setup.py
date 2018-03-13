@@ -6,9 +6,9 @@ from Cython.Build import cythonize
 VERSION = '0.93'
 
 # uncomment .pyx for building
-# f_type = '.pyx'
+f_type = '.pyx'
 # uncomment .c for packaging
-f_type = '.c'
+# f_type = '.c'
 
 # to compile from cython for build purposes
 # comment out the like above this and uncomment
@@ -25,8 +25,8 @@ ext_modules = [
     #           [f"persist_kv_store\\stores\\memstore{f_type}"]),
     # Extension("persist_kv_store.stores.redisstore",
     #           [f"persist_kv_store\\stores\\redisstore{f_type}"]),
-    # Extension("persist_kv_store.stores.persiststore",
-    #           [f"persist_kv_store\\stores\\persiststore{f_type}"]),
+    Extension("persist_kv_store.stores.cached_vedis",
+              [f"persist_kv_store\\stores\\cached_vedis{f_type}"]),
     Extension("persist_kv_store.stores.serializer",
               [f"persist_kv_store\\stores\\serializer{f_type}"]),
 ]

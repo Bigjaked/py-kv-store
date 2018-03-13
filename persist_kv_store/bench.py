@@ -51,7 +51,7 @@ def bench(db, its, msg=''):
     output_str_2 = ''
     output_str = '| {:<40}|'.format(dbn + ' ' + msg)
     st = default_timer()
-    if hasattr(db, 'set'):
+    if False:
         for i in range(0, its):
             db.set(f'key-{i}', f'value: {i}')
     else:
@@ -71,7 +71,7 @@ def bench(db, its, msg=''):
     )
     st = default_timer()
 
-    if hasattr(db, 'get'):
+    if False:
         for i in range(0, its):
             _ = db.get(f'key-{i}')
     else:

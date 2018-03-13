@@ -60,8 +60,8 @@ cdef class LRUCache:
     #         return self._cache[key]
     #     else:
     #         return none
-    # def __contains__(self, item):
-    #     return item in self._cache
+    def __contains__(self, str item):
+        return item in self._cache
 
     def set(self, str key, object value):
         self.set_(key, value)

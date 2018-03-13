@@ -21,7 +21,7 @@ Install with:
 
 .. code-block:: shell
 
-    pip install https://github.com/Bigjaked/py-kv-store/raw/master/dist/persist_kv_store-0.91.tar.gz
+    pip install https://github.com/Bigjaked/py-kv-store/raw/master/dist/persist_kv_store-0.93.tar.gz
 
 
 Supported Key Stores
@@ -42,7 +42,7 @@ Examples
 
     >>>db = SqliteMemoryStore()
 
-    >>>db['whatever-ascii-key-you-want'] = dict(can_i_use_dicts=True)
+    >>>db['whatever-utf-8-key-you-want'] = dict(can_i_use_dicts=True)
     >>>db['234234'] = 3
     >>>db['booleans'] = True
 

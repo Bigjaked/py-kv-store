@@ -13,6 +13,7 @@ except ImportError:
 from .basestore import SQLiteBase
 from .cache import LRUCache, DefaultDict, CacheDummy, CacheMixin
 from .serializer import KeyValueSerializer
+from .cached_vedis import CachedVedis
 # from .memstore import SqliteMemoryStore
 # from .persiststore import SqlitePersistentStore
 # from .redisstore import RedisStore

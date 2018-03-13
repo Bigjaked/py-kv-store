@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from persist_kv_store.stores import (
-    SQLiteBase as SqlitePersistentStore,
-    SQLiteBase as SqliteMemoryStore,
-    # RedisStore,
-    MemcacheStore, )
-from persist_kv_store.bench import bench, print_header, print_footer
-from persist_kv_store import LRUCache, CacheDummy
 from lru import LRU
+from vedis import Vedis
+
+from persist_kv_store import CacheDummy, LRUCache
+from persist_kv_store.bench import bench, print_footer, print_header
+from persist_kv_store.stores import (CachedVedis, MemcacheStore,
+    SQLiteBase as SqliteMemoryStore, SQLiteBase as SqlitePersistentStore, )  # RedisStore,
 
 
 def rm_file(file_):
@@ -16,11 +15,10 @@ def rm_file(file_):
 if __name__ == '__main__':
     import os
 
-
     benchmarks = [
         'overhead',
         # 'memcached',
-        'sqlite-mem',
+        # 'sqlite-mem',
         # 'redis',
         'vedis',
         # 'sqlite-disk',
@@ -32,15 +30,23 @@ if __name__ == '__main__':
     ba = bench_set.append
     if 'vedis' in benchmarks:
         try:
-            from vedis import Vedis
-
-
             db = Vedis(':mem:')
             ba(bench(db, its, 'Memory'), )
+
+            db = CachedVedis(':mem:', cache_size)
+            ba(bench(db, its, 'Memory + LRUCache'), )
+            del db
 
             rm_file('vedis-test.db')
             db = Vedis('vedis-test.db')
             ba(bench(db, its, 'Disk'))
+            db.close()
+            del db
+
+            rm_file('vedis-test.db')
+            db = CachedVedis('vedis-test.db', cache_size)
+            ba(bench(db, its, 'Disk + LRUCache'))
+            del db
         except ImportError:
             print('vedis is not installed, skipping benchmark')
     if 'overhead' in benchmarks:
@@ -66,17 +72,17 @@ if __name__ == '__main__':
         db = SqliteMemoryStore(':memory:', limit=cache_size, batch_size=2000)
         ba(bench(db, its, 'evict_after={} keys'.format(cache_size)))
 
-    if 'redis' in benchmarks:
-        try:
-            import redis
-
-
-            pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0)
-            rd = RedisStore(redis.Redis(connection_pool=pool))
-            db = RedisStore(rd)
-            ba(bench(db, its))
-        except ImportError:
-            print('redis is not installed, skipping benchmark')
+    # if 'redis' in benchmarks:
+    #     try:
+    #         import redis
+    #
+    #
+    #         pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0)
+    #         rd = RedisStore(redis.Redis(connection_pool=pool))
+    #         db = RedisStore(rd)
+    #         ba(bench(db, its))
+    #     except ImportError:
+    #         print('redis is not installed, skipping benchmark')
 
     if 'sqlite-disk' in benchmarks:
         db_file = 'test-db.db'

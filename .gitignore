@@ -20,4 +20,4 @@ __pycache__/
 *.json
 *.c
 /persist_kv_store/persist_kv_store/
-!/persist_kv_store/build/
+build/

@@ -15,7 +15,7 @@ cdef str SQL_QUERY = "SELECT v FROM kv_store WHERE k = ?;"
 cdef str SQL_COUNT = "SELECT count(1) FROM kv_store;"
 cdef str SQL_BEGIN = 'BEGIN;'
 cdef str SQL_END = 'COMMIT;'
-cdef str cNONE = 'cNone'
+cdef str cNONE = 'None'
 
 cdef dict custom_serializers = {
     '__datetime__': {
