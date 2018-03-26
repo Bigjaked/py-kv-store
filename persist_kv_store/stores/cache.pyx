@@ -23,13 +23,13 @@ cdef class CacheDummy:
 
     def __set__(self, str key, object value): pass
     def __setitem__(self, str key, object value): pass
-    cpdef void _set(self, str key, object value): pass
-    cpdef void set(self, str key, object value): pass
+    cdef void _set(self, str key, object value): pass
+    cdef void set(self, str key, object value): pass
 
     def __get__(self, str key, default): pass
     def __getitem__(self, str key): return none
-    cpdef str _get(self, str key): return none
-    cpdef str get(self, str key): return none
+    cdef str _get(self, str key): return ''
+    cdef str get(self, str key): return ''
 
 cdef class LRUCache:
     # cdef object _cache

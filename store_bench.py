@@ -24,7 +24,7 @@ if __name__ == '__main__':
         # 'sqlite-disk',
     ]
     run_cached = True
-    its = 100000
+    its = 1000000
     cache_size = its / 100
     bench_set = []
     ba = bench_set.append
