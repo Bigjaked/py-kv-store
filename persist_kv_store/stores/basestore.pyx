@@ -34,15 +34,14 @@ cdef class SQLiteBase(cache.CacheMixin):
         int _current_batch_len
         object con
         object cur
-    def __cinit__(self, str filename, **kwargs):
+
+    def __init__(self, str filename, **kwargs):
         self._serializer = serializer.KeyValueSerializer()
         self._batch_size = getattr(kwargs, 'batch_size', 1)
         self._lock = getattr(kwargs, 'lock', 0)
         self._since_last_commit = 0
         self._current_batch_len = 0
         self._ctx_manager_open = False
-
-    def __init__(self, str filename, **kwargs):
         cache.CacheMixin.__init__(self, **kwargs)
         self.current_batch = []
         filename = filename or ':memory:'

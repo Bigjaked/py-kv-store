@@ -32,10 +32,10 @@ cdef class CacheDummy:
     cdef str get(self, str key): return ''
 
 cdef class LRUCache:
-    def __cinit__(self, int _limit):
-        self._cache = OrderedDict()
-        self._count = 0
-        self._limit = _limit
+    # def __cinit__(self, int _limit):
+    #     self._cache = OrderedDict()
+    #     self._count = 0
+    #     self._limit = _limit
     def __init__(self, _limit):
         self._count = 0
         self._cache = OrderedDict()
@@ -65,7 +65,7 @@ cdef class LRUCache:
     def __setitem__(self, object key, object value): self.set_(str(key), value)
 
 cdef class CacheMixin:
-    def __cinit__(self, *args, **kwargs): pass
+    # def __cinit__(self, *args, **kwargs): pass
 
     def __init__(self, **kwargs):
         self.limit = getattr(kwargs, 'limit', DEFAULT_CACHE_LIMIT)
