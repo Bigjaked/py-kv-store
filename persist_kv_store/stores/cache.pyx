@@ -5,7 +5,7 @@
 from collections import OrderedDict
 from . import DEFAULT_CACHE_LIMIT
 
-from cache cimport CacheMixin, LRUCache
+# from cache cimport CacheMixin, LRUCache
 
 
 cdef str none = 'None'

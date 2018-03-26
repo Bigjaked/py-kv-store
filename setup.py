@@ -3,10 +3,10 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 
 
-VERSION = '0.99'
+VERSION = '0.100'
 
 # uncomment .pyx for building
-# f_type = '.pyx'
+f_type = '.pyx'
 # uncomment .c for packaging
 f_type = '.c'
 
