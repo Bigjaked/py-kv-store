@@ -2,41 +2,38 @@
 import sqlite3
 from datetime import datetime
 
-cimport serializer
-cimport cache
-
+cimport serializer, cache
 
 #cythn: boundscheck=False, wraparound=False, nonecheck=False
 
-cdef str SQL_TABLE_EXISTS = 'SELECT * FROM sqlite_master WHERE type=\'table\' AND name=?;'
-cdef str SQL_INSERT_MANY = 'REPLACE INTO kv_store (k, v) VALUES (?, ?);'
-cdef str SQL_KV_SCHEMA = 'CREATE TABLE kv_store (k TEXT PRIMARY KEY, v TEXT NOT NULL);'
-cdef str SQL_QUERY = "SELECT v FROM kv_store WHERE k = ?;"
-cdef str SQL_COUNT = "SELECT count(1) FROM kv_store;"
-cdef str SQL_BEGIN = 'BEGIN;'
-cdef str SQL_END = 'COMMIT;'
-cdef str cNONE = 'None'
-
-cdef dict custom_serializers = {
-    '__datetime__': {
-        'serialize': lambda dt: {'type-key': '__datetime__', 'val': dt.isoformat()},
-        'deserialize': lambda o: datetime.strptime(o['val'], "%Y%m%dT%H:%M:%S.%f")
+cdef:
+    str SQL_TABLE_EXISTS = 'SELECT * FROM sqlite_master WHERE type=\'table\' AND name=?;'
+    str SQL_INSERT_MANY = 'REPLACE INTO kv_store (k, v) VALUES (?, ?);'
+    str SQL_KV_SCHEMA = 'CREATE TABLE kv_store (k TEXT PRIMARY KEY, v TEXT NOT NULL);'
+    str SQL_QUERY = "SELECT v FROM kv_store WHERE k = ?;"
+    str SQL_COUNT = "SELECT count(1) FROM kv_store;"
+    str SQL_BEGIN = 'BEGIN;'
+    str SQL_END = 'COMMIT;'
+    str cNONE = 'None'
+    dict custom_serializers = {
+        '__datetime__': {
+            'serialize': lambda dt: {'type-key': '__datetime__', 'val': dt.isoformat()},
+            'deserialize': lambda o: datetime.strptime(o['val'], "%Y%m%dT%H:%M:%S.%f")
+        }
     }
-}
-cdef dict types = {
-    datetime: '__datetime__'
-}
+    dict types = {datetime: '__datetime__'}
 
 cdef class SQLiteBase(cache.CacheMixin):
-    cdef serializer.KeyValueSerializer _serializer
-    cdef int _since_last_commit
-    cdef int _batch_size
-    cdef bint _ctx_manager_open
-    cdef object _lock
-    cdef list current_batch
-    cdef int _current_batch_len
-    cdef object con
-    cdef object cur
+    cdef:
+        serializer.KeyValueSerializer _serializer
+        int _since_last_commit
+        int _batch_size
+        bint _ctx_manager_open
+        object _lock
+        list current_batch
+        int _current_batch_len
+        object con
+        object cur
     def __cinit__(self, str filename, **kwargs):
         self._serializer = serializer.KeyValueSerializer()
         self._batch_size = getattr(kwargs, 'batch_size', 1)
@@ -112,22 +109,28 @@ cdef class SQLiteBase(cache.CacheMixin):
         cdef int res = self.cur.execute(SQL_COUNT).fetchone()[0]
         return res
 
-    cdef commit(self):
+    cdef void commit(self):
         self.con.commit()
         self._current_batch_len = 0
 
-    cpdef void set(self, str key, object value):
-        self._set_cached(key, value)
+    cpdef void set(self, object key, object value):
+        cdef str k = str(key)
+        self._set_cached(k, value)
         cdef str packed = self._serializer.serialize(value)
-        self._insert(key, value)
+        self._insert(k, value)
 
-    cpdef object get(self, str key):
-        cdef object cached = self._get_cached(key)
+    cpdef object get(self, object key):
+        cdef str k = str(key)
+        cdef object cached = self._get_cached(k)
         if cached is not cNONE: return cached
-        cdef object packed = self._query(key)
+        cdef object packed = self._query(k)
         if packed:
             return self._serializer.unserialize(packed)
         return cNONE
+    def __contains__(self, object item):
+        if self.get(item) is not cNONE:
+            return True
+        return False
 
     def __enter__(self):
         self._flush(True)
