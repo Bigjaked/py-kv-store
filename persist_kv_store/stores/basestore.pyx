@@ -103,10 +103,12 @@ cdef class SQLiteBase(cache.CacheMixin):
         self._flush(True)
         cdef object res = self.cur.execute(
           SQL_QUERY, (key_,)).fetchone()
-
-        if res[0] is not None:
-            return res[0]
-        return cNONE
+        try:
+            if res[0] is not None:
+                return res[0]
+            return cNONE
+        except (IndexError, TypeError):
+            return cNONE
 
     cdef int _count(self):
         cdef int res = self.cur.execute(SQL_COUNT).fetchone()[0]
