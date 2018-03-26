@@ -6,7 +6,7 @@ from Cython.Build import cythonize
 VERSION = '0.99'
 
 # uncomment .pyx for building
-f_type = '.pyx'
+# f_type = '.pyx'
 # uncomment .c for packaging
 f_type = '.c'
 
