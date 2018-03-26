@@ -3,7 +3,7 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 
 
-VERSION = '0.96'
+VERSION = '0.97'
 
 # uncomment .pyx for building
 f_type = '.pyx'
