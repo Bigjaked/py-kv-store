@@ -116,12 +116,12 @@ cdef class SQLiteBase(cache.CacheMixin):
         self.con.commit()
         self._current_batch_len = 0
 
-    cpdef set(self, str key, object value):
+    cpdef void set(self, str key, object value):
         self._set_cached(key, value)
         cdef str packed = self._serializer.serialize(value)
         self._insert(key, value)
 
-    cpdef get(self, str key):
+    cpdef object get(self, str key):
         cdef object cached = self._get_cached(key)
         if cached is not cNONE: return cached
         cdef object packed = self._query(key)
