@@ -129,7 +129,7 @@ cdef class SQLiteBase(cache.CacheMixin):
         cdef object cached = self._get_cached(k)
         if cached is not cNONE: return cached
         cdef object packed = self._query(k)
-        if packed:
+        if packed and packed is not cNONE:
             return self._serializer.unserialize(packed)
         return cNONE
     def __contains__(self, object item):
