@@ -26,37 +26,33 @@ cdef dict types = {datetime: '__datetime__'}
 cdef NONE = 'None'
 
 cdef class KeyValueSerializer:
-    # cdef dict serializers
     def __init__(self):
         self.serializers = custom_serializers
         self._ujson = ujson
-    # def c__init__(self):
-    #     self.serializers = custom_serializers
-    # cdef _pack(self, obj):
-    #     """Serialize our `obj`"""
-    #     return ujson.dumps(obj)
-    # cdef _unpack(self, obj):
-    #     """Deserialize our `obj`"""
-    #     return ujson.loads(obj)
-    # cdef object _before_pack(self, object obj):
-    #     cdef str type_key = getattr(types, str(type(obj)), NONE)
-    #     if type_key is not NONE:
-    #         return self.serializers[type_key]['serialize'](obj)
-    #     else:
-    #         return obj
-    # cdef object _after_unpack(self, object obj):
-    #     t = getattr(self.serializers, 'type-key', NONE)
-    #     if t is not NONE:
-    #         return self.serializers[t]['deserialize'](obj)
-    #     else:
-    #         return obj
-    # cdef str serialize(self, object value):
-    #     cdef object val = self._before_pack(value)
-    #     cdef str packed = self._pack(val)
-    #     return packed
-    #
-    # cdef str deserialize(self, object value):
-    #     cdef str o = self._unpack(value)
-    #     return self._after_unpack(o)
-    # cdef str unserialize(self, object value):
-    #     return self.deserialize(value)
+    cdef str _pack(self, object obj):
+        """Serialize our `obj`"""
+        return self._ujson.dumps(obj)
+    cdef str _unpack(self, object obj):
+        """Deserialize our `obj`"""
+        return self._ujson.loads(obj)
+    cdef object _before_pack(self, object obj):
+        cdef str type_key = getattr(types, str(type(obj)), NONE)
+        if type_key is not NONE:
+            return self.serializers[type_key]['serialize'](obj)
+        else:
+            return obj
+    cdef object _after_unpack(self, object obj):
+        t = getattr(self.serializers, 'type-key', NONE)
+        if t is not NONE:
+            return self.serializers[t]['deserialize'](obj)
+        else:
+            return obj
+    cdef str serialize(self, object value):
+        cdef object val = self._before_pack(value)
+        cdef str packed = self._pack(val)
+        return packed
+    cdef str deserialize(self, object value):
+        cdef str o = self._unpack(value)
+        return self._after_unpack(o)
+    cdef str unserialize(self, object value):
+        return self.deserialize(value)
