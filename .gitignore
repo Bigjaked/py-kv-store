@@ -21,3 +21,4 @@ __pycache__/
 *.c
 /persist_kv_store/persist_kv_store/
 build/
+*.so

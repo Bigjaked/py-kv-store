@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from lru import LRU
 from vedis import Vedis
 
 from persist_kv_store import CacheDummy, LRUCache

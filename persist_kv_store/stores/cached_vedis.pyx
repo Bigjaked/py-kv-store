@@ -2,12 +2,12 @@
 
 import vedis
 from . import DEFAULT_CACHE_LIMIT
-from .serializer import KeyValueSerializer
+from .serializer cimport KeyValueSerializer
 cimport cache
 
 
 cdef class CachedVedis(cache.CacheMixin):
-
+    cdef KeyValueSerializer _serializer
     cdef str file_location
     cdef object _vedis_db
     def __init__(self, file_=':mem:', limit_=DEFAULT_CACHE_LIMIT):
@@ -31,17 +31,23 @@ cdef class CachedVedis(cache.CacheMixin):
             return p
         return None
 
-    def set(self, str key, object value):
-        self.set_(key, value)
+    def set(self, object key, object value):
+        self.set_(str(key), value)
 
     def get(self, key):
-        return self.get_(key)
+        return self.get_(str(key))
 
-    def __setitem__(self, str key, object value):
-        self.set_(key, value)
+    def __setitem__(self,object key, object value):
+        self.set_(str(key), value)
 
-    def __getitem__(self, str item):
-        return self.get_(item)
+    def __getitem__(self, object item):
+        return self.get_(str(item))
+
+    def __contains__(self, item):
+        if str(item) in self._vedis_db:
+            return True
+        else:
+            return False
 
     def __del__(self):
         try:
