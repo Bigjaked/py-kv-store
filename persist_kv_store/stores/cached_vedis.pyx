@@ -37,7 +37,11 @@ cdef class CachedVedis(cache.CacheMixin):
     def get(self, key):
         return self.get_(str(key))
 
-    def __setitem__(self,object key, object value):
+    @property
+    def db(self):
+        return self._vedis_db
+
+    def __setitem__(self, object key, object value):
         self.set_(str(key), value)
 
     def __getitem__(self, object item):

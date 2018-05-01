@@ -5,7 +5,7 @@ from Cython.Build import cythonize
 
 
 S = os.sep
-VERSION = '0.1041'
+VERSION = '0.105'
 
 # to compile from cython for build purposes
 # comment out the like above this and uncomment
