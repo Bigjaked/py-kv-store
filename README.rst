@@ -69,8 +69,8 @@ Here is an example of how each benchmark is run
         a = db['key-{i}'.format(i=i)]
     get_time = default_timer() - get_start
 
-Benchmark was run on a MSI GS60 PRO-4k 32GB DDR4, i7-6700HQ
-Main storage is a Samsung 950 PRO 512GB (2500 MB/s Read 1500 MB/s write)
+Benchmark was run on a MSI GS60 32GB DDR4, i7-6700HQ
+Main storage is a Samsung 950 PRO 512GB 
 
 
 +-----------------------------------------+---------------+---------------+---------------+---------------+
@@ -94,6 +94,3 @@ Main storage is a Samsung 950 PRO 512GB (2500 MB/s Read 1500 MB/s write)
 +-----------------------------------------+---------------+---------------+---------------+---------------+
 | CachedVedis Disk + LRUCache             |   155.47 K    |   372.70 K    |    6.43 us    |    2.68 us    |
 +-----------------------------------------+---------------+---------------+---------------+---------------+
-
-Process finished with exit code 0
-
