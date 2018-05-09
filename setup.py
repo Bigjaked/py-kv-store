@@ -7,11 +7,6 @@ from Cython.Build import cythonize
 S = os.sep
 VERSION = '0.105'
 
-# to compile from cython for build purposes
-# comment out the like above this and uncomment
-# this one.
-# "persist_kv_store{S}stores{S}cache{S}cache.pyx "
-
 if sys.argv[1] == 'build_ext':
     f_type = '.pyx'
 else:
@@ -38,9 +33,10 @@ ext_modules = [
 setup(
   name="persist_kv_store",
   version=VERSION,
-  description="Python key value persistance mechanism",
+  description="Python key value stores",
   author='Jacob Duncan',
   author_email='jacob.duncan@truepowere.com',
   packages=['persist_kv_store', f'persist_kv_store{S}stores'],
-  url='https://github.com/Bigjaked/py-kv-store/raw/master/persist_kv_store.zip',
+  url=f'https://github.com/Bigjaked/py-kv-store/raw/master/persist_kv_store-'
+      f'{VERSION}.tar.gz',
   ext_modules=cythonize(ext_modules))
