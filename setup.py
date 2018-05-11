@@ -5,7 +5,7 @@ from Cython.Build import cythonize
 
 
 S = os.sep
-VERSION = '0.105'
+VERSION = '0.106'
 
 if sys.argv[1] == 'build_ext':
     f_type = '.pyx'

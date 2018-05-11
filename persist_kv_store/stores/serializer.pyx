@@ -11,7 +11,7 @@ from serializer cimport KeyValueSerializer
 def serialize_datetime(object dt):
     return {'type-key': '__datetime__', 'val': dt.isoformat()}
 
-def deserialize_datetime(dict dt):
+def deserialize_datetime(object dt):
     return datetime.strptime(dt['val'], "%Y%m%dT%H:%M:%S.%f")
 
 cdef inline dict custom_serializers = {
@@ -32,7 +32,7 @@ cdef class KeyValueSerializer:
     cdef str _pack(self, object obj):
         """Serialize our `obj`"""
         return self._ujson.dumps(obj)
-    cdef str _unpack(self, object obj):
+    cdef object _unpack(self, object obj):
         """Deserialize our `obj`"""
         return self._ujson.loads(obj)
     cdef object _before_pack(self, object obj):
@@ -51,8 +51,8 @@ cdef class KeyValueSerializer:
         cdef object val = self._before_pack(value)
         cdef str packed = self._pack(val)
         return packed
-    cdef str deserialize(self, object value):
+    cdef object deserialize(self, object value):
         cdef str o = self._unpack(value)
         return self._after_unpack(o)
-    cdef str unserialize(self, object value):
+    cdef object unserialize(self, object value):
         return self.deserialize(value)
