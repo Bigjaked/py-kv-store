@@ -52,7 +52,7 @@ cdef class KeyValueSerializer:
         cdef str packed = self._pack(val)
         return packed
     cdef object deserialize(self, object value):
-        cdef str o = self._unpack(value)
+        cdef object o = self._unpack(value)
         return self._after_unpack(o)
     cdef object unserialize(self, object value):
         return self.deserialize(value)
